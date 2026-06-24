@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "../..",
+    "paths": {
+      "@/*": ["./apps/desktop/src/*"],
+      "@tps/shared/types": ["./packages/shared/src/types/index.ts"]
+    },
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "moduleDetection": "force"
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

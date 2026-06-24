@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build artifacts
+dist/
+.vite/
+*.tsbuildinfo
+
+# Rust / Tauri
+target/
+**/target/
+
+# Stale TypeScript build output sitting next to source files
+# (causes Vite to pick up old .js instead of .tsx)
+packages/**/src/**/*.js
+packages/**/src/**/*.d.ts
+apps/**/src/**/*.js
+apps/**/src/**/*.d.ts
+
+# OS / editor
+.DS_Store
+*.log
+Thumbs.db
+.idea/
+.vscode/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Tauri-generated icon placeholders we don't want to commit
+apps/desktop/src-tauri/icons/*.bak

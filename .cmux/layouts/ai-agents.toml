@@ -1,0 +1,26 @@
+name = "ai-agents"
+
+[[panes]]
+name = "orchestrator"
+command = "claude"
+env = { CLAUDE_AGENT = "orchestrator" }
+
+[[panes]]
+name = "frontend"
+command = "claude"
+env = { CLAUDE_AGENT = "frontend" }
+
+[[panes]]
+name = "gis"
+command = "claude"
+env = { CLAUDE_AGENT = "gis" }
+
+[[panes]]
+name = "backend"
+command = "claude"
+env = { CLAUDE_AGENT = "backend" }
+
+[[panes]]
+name = "testing"
+command = "claude"
+env = { CLAUDE_AGENT = "testing" }

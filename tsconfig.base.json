@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "useDefineForClassFields": true,
+    "baseUrl": ".",
+    "paths": {
+      "@tps/shared": ["./packages/shared/src/index.ts"],
+      "@tps/shared/*": ["./packages/shared/src/*"],
+      "@tps/ui": ["./packages/ui/src/index.ts"],
+      "@tps/ui/*": ["./packages/ui/src/index.ts"],
+      "@tps/workflow-core": ["./packages/workflow-core/src/index.ts"],
+      "@tps/workflow-core/*": ["./packages/workflow-core/src/*"],
+      "@tps/workflow-ui": ["./packages/workflow-ui/src/index.ts"],
+      "@tps/workflow-ui/*": ["./packages/workflow-ui/src/*"],
+      "@tps/gis-core": ["./packages/gis-core/src/index.ts"],
+      "@tps/gis-core/*": ["./packages/gis-core/src/*"],
+      "@tps/data-core": ["./packages/data-core/src/index.ts"],
+      "@tps/data-core/*": ["./packages/data-core/src/*"],
+      "@tps/ai-core": ["./packages/ai-core/src/index.ts"],
+      "@tps/ai-core/*": ["./packages/ai-core/src/*"],
+      "@tps/asset-core": ["./packages/asset-core/src/index.ts"],
+      "@tps/asset-core/*": ["./packages/asset-core/src/*"],
+      "@tps/export-core": ["./packages/export-core/src/index.ts"],
+      "@tps/export-core/*": ["./packages/export-core/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "**/target", "**/node_modules"]
+}

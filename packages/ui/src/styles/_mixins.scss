@@ -1,0 +1,31 @@
+@use 'variables' as *;
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: justify-between;
+  justify-content: space-between;
+}
+
+@mixin truncate-1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin scrollbar-dark {
+  &::-webkit-scrollbar { width: 8px; height: 8px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 4px; }
+  &::-webkit-scrollbar-thumb:hover { background: hsl(var(--ring)); }
+}
+
+@mixin transition($prop: all) {
+  transition: $prop $transition-base;
+}

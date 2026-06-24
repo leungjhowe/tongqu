@@ -1,0 +1,42 @@
+{
+  "name": "@tps/ui",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./styles": "./src/styles/globals.scss",
+    "./styles/globals.scss": "./src/styles/globals.scss",
+    "./styles/_shadcn.scss": "./src/styles/_shadcn.scss",
+    "./styles/_variables.scss": "./src/styles/_variables.scss",
+    "./styles/_mixins.scss": "./src/styles/_mixins.scss"
+  },
+  "publishConfig": {
+    "access": "private"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "echo 'no lint yet'",
+    "clean": "rm -rf dist .tsbuildinfo"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "dependencies": {
+    "@tps/shared": "workspace:*",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.4",
+    "class-variance-authority": "^0.7.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "sass": "^1.79.4",
+    "typescript": "^5.5.4"
+  }
+}
