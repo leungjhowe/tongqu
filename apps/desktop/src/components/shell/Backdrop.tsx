@@ -101,6 +101,7 @@ function FlowField() {
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [paths, setPaths] = useState<FlowPath[]>([]);
   const pathRefs = useRef<Array<SVGPathElement | null>>([]);
+  const [prefersReduced, setPrefersReduced] = useState(false);
 
   // Track size
   useEffect(() => {
@@ -112,6 +113,15 @@ function FlowField() {
     });
     ro.observe(el);
     return () => ro.disconnect();
+  }, []);
+
+  // Respect prefers-reduced-motion: skip GSAP animation; paths render statically.
+  useEffect(() => {
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReduced(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
   }, []);
 
   // Regenerate path geometry when size changes
@@ -134,6 +144,7 @@ function FlowField() {
   // Animate strokes via GSAP
   useGSAP(
     () => {
+      if (prefersReduced) return;
       pathRefs.current.forEach((p, i) => {
         if (!p) return;
         const meta = paths[i];
@@ -154,7 +165,7 @@ function FlowField() {
         );
       });
     },
-    { dependencies: [paths], scope: containerRef },
+    { dependencies: [paths, prefersReduced], scope: containerRef },
   );
 
   return (

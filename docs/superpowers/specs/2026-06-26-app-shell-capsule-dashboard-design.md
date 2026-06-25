@@ -41,7 +41,7 @@
 | `Logo.tsx` | 左胶囊，logo `TP` 标记 + 短产品名（折叠态只显 logo，hover 展开产品名） |
 | `NavRail.tsx` | 中间 4 个胶囊导航容器，承载 `useUIStore.activeNavKey` |
 | `NavCapsule.tsx` | 单个导航胶囊：icon + 折叠 label，hover 展开 |
-| `UserMenu.tsx` | 右侧用户胶囊：头像 + 用户名（折叠态只显头像），下拉含"设置/退出"占位 |
+| `UserMenu.tsx` | 右侧用户胶囊：头像 + 用户名（默认展开用户名），下拉含"设置/退出"占位 |
 | `DashboardHome.tsx` | 主体内容容器：HeroHeadline + AiPromptCapsule + ProjectRail |
 | `HeroHeadline.tsx` | "今天要做什么？"大标题 + 副标题 |
 | `AiPromptCapsule.tsx` | AI 对话框胶囊：占位文本 + 发送按钮 |
@@ -84,7 +84,7 @@
 | 导航胶囊 | hover | 200ms ease 展开至 132px；label 透明度 0→1；底色 `--capsule-bg-hover` |
 | 导航胶囊 | active | 底色 `hsl(var(--primary) / 0.16)`；边 `hsl(var(--capsule-border-active))`；8px 外发光 `hsl(var(--capsule-glow))`；label 始终显 |
 | Logo 胶囊 | 同上模式 | hover 展开"交通规划 AI"产品名 |
-| 用户胶囊 | hover | 展开用户名 + 下拉箭头；点击展开下拉菜单（设置 / 退出） |
+| 用户胶囊 | 默认展开用户名（始终可见），无 chevron | 点击胶囊切换下拉（设置 / 退出）；点击外部收起 |
 | AI 输入胶囊 | 默认 | 占位文字"问点什么吧…，按 Enter 发送"；右端发送按钮 |
 | AI 输入胶囊 | focus | 整胶囊 8px 外发光 `--capsule-glow` |
 | AI 输入胶囊 | 提交 | 当前为占位——打印输入到 console；未来接 `@tps/ai-core` |
