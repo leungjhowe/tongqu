@@ -3,10 +3,10 @@ import { test, expect, type Page } from "@playwright/test";
 /** Mock auth: any non-empty username/password succeeds. */
 async function login(page: Page) {
   await page.goto("/login");
-  // Login uses a FloatingInput that renders <label> as a sibling (no id/for).
-  // AutoComplete attributes give us a stable hook.
-  await page.locator('input[autocomplete="username"]').fill("tester");
-  await page.locator('input[autocomplete="current-password"]').fill("any");
+  // FloatingInput wires <label htmlFor> to <input id> via React useId,
+  // so getByLabel can resolve the field by its accessible name.
+  await page.getByLabel("用户名").fill("tester");
+  await page.getByLabel("密码").fill("any");
   await page.getByRole("button", { name: /进入系统/ }).click();
   await page.waitForURL(/\/app/);
 }

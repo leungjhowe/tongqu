@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useId,
   useRef,
   useState,
   type FormEvent,
@@ -291,11 +292,13 @@ function FloatingInput({
   const filled = value.length > 0;
   const floating = focused || filled;
   const showError = Boolean(error);
+  const id = useId();
 
   return (
     <div className="relative pt-5">
       <input
         {...rest}
+        id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onFocus={(e) => {
@@ -317,6 +320,7 @@ function FloatingInput({
         }
       />
       <label
+        htmlFor={id}
         className={
           "pointer-events-none absolute left-0 origin-left transition-all duration-200 ease-out " +
           (floating
