@@ -15,7 +15,7 @@ export default function NavCapsule({ navKey, label, icon, active, onSelect }: Na
     <Capsule
       as="button"
       active={active}
-      alwaysShowLabel={active}
+      alwaysShowLabel
       icon={icon}
       label={<span className="text-sm whitespace-nowrap">{label}</span>}
       onClick={() => onSelect(navKey)}
