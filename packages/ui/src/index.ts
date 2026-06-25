@@ -15,3 +15,6 @@ export { MapPanel } from './components/MapPanel';
 
 export { ChatPanel } from './components/ChatPanel';
 export type { ChatPanelMessage, ChatPanelProps } from './components/ChatPanel';
+
+export { Capsule } from './components/Capsule';
+export type { CapsuleProps } from './components/Capsule';
