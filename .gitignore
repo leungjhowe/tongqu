@@ -24,6 +24,7 @@ apps/**/src/**/*.d.ts
 Thumbs.db
 .idea/
 .vscode/
+.playwright-mcp/
 
 # Env
 .env

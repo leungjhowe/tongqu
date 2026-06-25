@@ -68,7 +68,8 @@ a {
   color: hsl(var(--primary-foreground));
 }
 
-*:focus-visible {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
-}
+/* The default browser focus ring is intentionally omitted.  Interactive */
+/* elements declare their own focus-visible treatment: the form inputs */
+/* show a primary border + animated underline, the submit button shows */
+/* a primary halo ring.  Keep this file lean so component authors own  */
+/* the focus language per surface.                                    */

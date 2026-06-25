@@ -18,7 +18,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const describedBy = error || hint ? `${inputId}-desc` : undefined;
 
     return (
-      <div className={cn('flex flex-col gap-3', block && 'w-full')}>
+      <div className={cn('flex flex-col gap-1.5', block && 'w-full')}>
         {label && (
           <label
             htmlFor={inputId}
@@ -33,8 +33,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
           className={cn(
-            // layout — h-20 (80px) with py-6 (24px) gives the text real vertical breathing room
-            'flex w-full rounded-md px-4 py-6 text-base min-h-20',
+            // layout — h-10 (40px) with py-2.5 keeps the field compact and tap-friendly
+            'flex w-full rounded-md px-3.5 py-2.5 text-sm min-h-10',
             // base look — transparent so it sits cleanly on any panel
             'bg-transparent border border-border/70 text-foreground',
             'placeholder:text-muted-foreground/50',
