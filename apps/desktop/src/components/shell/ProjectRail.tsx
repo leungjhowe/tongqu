@@ -1,40 +1,48 @@
+import { ArrowRight } from "lucide-react";
 import { MOCK_PROJECTS, type Project } from "@/data/mockProjects";
 import NewProjectCapsule from "./NewProjectCapsule";
 import ProjectCapsule from "./ProjectCapsule";
 
 interface ProjectRailProps {
-  projects?: Project[];
+  projects?: Project[];          // optional override
   onOpen: (id: string) => void;
   onNew: () => void;
   onAll: () => void;
 }
 
+const MAX_RECENT = 3;
+
 export default function ProjectRail({ projects, onOpen, onNew, onAll }: ProjectRailProps) {
-  const list = projects ?? MOCK_PROJECTS;
-  const isEmpty = list.length === 0;
+  const all = projects ?? MOCK_PROJECTS;
+  const isEmpty = all.length === 0;
+  const recent = all.slice(0, MAX_RECENT);
 
   return (
-    <div className="w-full max-w-2xl">
+    <div className="w-full">
       {isEmpty ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="capsule cursor-default" data-always-show-label="true">
-            <span className="capsule__label text-base text-muted-foreground">
-              暂无历史项目，去新建一个 →
-            </span>
-          </div>
+        <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
+          暂无历史项目，去<button onClick={onNew} className="ml-1 text-primary hover:underline">新建一个</button>
         </div>
       ) : (
-        <div
-          aria-label="最近项目横向列表"
-          className="w-full overflow-x-auto overflow-y-hidden px-1 py-2"
-        >
-          <div className="flex items-stretch gap-3 min-w-min">
+        <>
+          <div className="flex items-stretch gap-3">
             <NewProjectCapsule onClick={onNew} />
-            {list.map((p) => (
+            {recent.map((p) => (
               <ProjectCapsule key={p.id} project={p} onOpen={onOpen} />
             ))}
           </div>
-        </div>
+          <div className="mt-4 flex justify-end">
+            <button
+              type="button"
+              onClick={onAll}
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-secondary"
+              aria-label="查看所有项目"
+            >
+              所有项目
+              <ArrowRight className="w-3.5 h-3.5" aria-hidden />
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

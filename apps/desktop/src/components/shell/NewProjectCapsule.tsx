@@ -1,4 +1,3 @@
-import { Capsule } from "@tps/ui";
 import { Plus } from "lucide-react";
 
 interface NewProjectCapsuleProps {
@@ -7,14 +6,14 @@ interface NewProjectCapsuleProps {
 
 export default function NewProjectCapsule({ onClick }: NewProjectCapsuleProps) {
   return (
-    <Capsule
-      as="button"
-      dashed
+    <button
+      type="button"
       onClick={onClick}
-      icon={<Plus className="w-4 h-4 text-primary" aria-hidden />}
-      alwaysShowLabel
-      label={<span className="text-sm whitespace-nowrap text-foreground">新建项目</span>}
       title="新建项目"
-    />
+      className="group flex flex-col items-center justify-center gap-2 w-[200px] h-[150px] rounded-lg border-2 border-dashed border-[hsl(var(--capsule-border-active)/0.5)] bg-transparent hover:border-solid hover:border-[hsl(var(--capsule-border-active))] hover:bg-[hsl(var(--capsule-bg)/0.4)] hover:scale-[1.02] transition-[transform,border-color,background-color] duration-200 cursor-pointer"
+    >
+      <Plus className="w-7 h-7 text-primary group-hover:scale-110 transition-transform" aria-hidden />
+      <span className="text-sm font-medium text-foreground">新建项目</span>
+    </button>
   );
 }
