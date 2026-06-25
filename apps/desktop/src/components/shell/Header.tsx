@@ -9,7 +9,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   return (
-    <header className="relative z-20 h-16 flex-shrink-0 w-full flex items-center justify-between gap-4 px-6">
+    <header className="relative z-20 h-20 flex-shrink-0 w-full flex items-center justify-between gap-4 px-6">
       <Logo onClick={() => {
         setActiveNav("home");
         navigate("/app/home");
