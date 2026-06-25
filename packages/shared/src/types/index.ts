@@ -1,7 +1,7 @@
 export type ID = string;
 export type ISODateString = string;
 
-export type NavKey = 'projects' | 'workflows' | 'data' | 'assets' | 'settings';
+export type NavKey = 'home' | 'workspace' | 'assets' | 'templates';
 
 export interface User {
   id: ID;

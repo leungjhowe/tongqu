@@ -13,11 +13,10 @@ export const LAYOUT = {
 } as const;
 
 export const NAV_ITEMS: ReadonlyArray<{ key: NavKey; label: string; icon: string }> = [
-  { key: 'projects',  label: '项目列表', icon: 'LayersIcon' },
-  { key: 'workflows', label: '工作流',   icon: 'CodeIcon' },
-  { key: 'data',      label: '数据管理', icon: 'BarChartIcon' },
-  { key: 'assets',    label: '资产库',   icon: 'ArchiveIcon' },
-  { key: 'settings',  label: '设置',     icon: 'GearIcon' },
+  { key: 'home',      label: '主页',     icon: 'HomeIcon' },
+  { key: 'workspace', label: '工作空间', icon: 'LayoutIcon' },
+  { key: 'assets',    label: '资产',     icon: 'ArchiveIcon' },
+  { key: 'templates', label: '模板',     icon: 'LayersIcon' },
 ];
 
 export const THEME = {
