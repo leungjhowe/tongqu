@@ -1,23 +1,32 @@
 import { create } from "zustand";
+import type { NavKey } from "@tps/shared";
+
+export type BackdropVariant = "flow" | "grid" | "plain";
 
 export interface UIState {
+  // 既有（本轮保留以避免破坏其他模块，后续清理）
   sidebarCollapsed: boolean;
   chatPanelCollapsed: boolean;
-  activeNavKey: string;
+  activeNavKey: NavKey;
   toggleSidebar: () => void;
   toggleChatPanel: () => void;
-  setActiveNav: (key: string) => void;
+  setActiveNav: (key: NavKey) => void;
+
+  // 本轮新增
+  promptValue: string;
+  setPromptValue: (v: string) => void;
+  backdropVariant: BackdropVariant;
+  setBackdropVariant: (v: BackdropVariant) => void;
 }
 
 /**
- * UI store — holds cross-page chrome state (sidebar, chat panel, active nav).
- * Intentionally not persisted: this is per-session UI affordance state, and
- * collapsing the sidebar on one visit shouldn't bleed into the next.
+ * UI store — 跨页 chrome 状态（侧栏、聊天面板、激活导航、提示词、背景变体）。
+ * 未持久化：均为 per-session UI affordance，刷新即重置。
  */
 export const useUIStore = create<UIState>((set) => ({
   sidebarCollapsed: false,
   chatPanelCollapsed: false,
-  activeNavKey: "projects",
+  activeNavKey: "home",
 
   toggleSidebar: () => {
     set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed }));
@@ -29,5 +38,15 @@ export const useUIStore = create<UIState>((set) => ({
 
   setActiveNav: (key) => {
     set({ activeNavKey: key });
+  },
+
+  promptValue: "",
+  setPromptValue: (v) => {
+    set({ promptValue: v });
+  },
+
+  backdropVariant: "flow",
+  setBackdropVariant: (v) => {
+    set({ backdropVariant: v });
   },
 }));
