@@ -128,9 +128,12 @@ export interface UIState {
   toggleSidebar: () => void;
   toggleChatPanel: () => void;
   setActiveNav: (key: NavKey) => void;
-  // 新增
+  // 新增（本轮）
   promptValue: string;
   setPromptValue: (v: string) => void;
+  // 预留（未来设置页换肤使用，本轮不接入 UI）
+  backdropVariant: 'flow' | 'grid' | 'plain';
+  setBackdropVariant: (v: 'flow' | 'grid' | 'plain') => void;
 }
 ```
 
@@ -156,7 +159,7 @@ export interface UIState {
 | `MOCK_PROJECTS` 为空 | `ProjectRail` 显示空状态胶囊："暂无历史项目，去新建一个 →"（仍保留 `NewProjectCapsule`） |
 | 路由不存在 | `<Navigate to="/app/home" replace />` |
 | `prefers-reduced-motion: reduce` | `Backdrop` 跳过 GSAP 流光，仅渲染静态点阵 |
-| 窗口宽度 < 640px | 横向项目胶囊行强制可滚动；Header 中间 4 个胶囊简化为 icon-only（去掉 hover 展开） |
+| 窗口宽度 < 640px | 横向项目胶囊行强制可滚动；Header 中间 4 个胶囊不展开 label（始终 icon-only，hover 无变化） |
 
 ## 8. 背景层
 
@@ -170,18 +173,21 @@ export interface UIState {
 
 未来设置页换肤：调用 `useUIStore` 持久化 `backdropVariant`，`Backdrop` 读取并切换。**本期只做占位接入**——不加设置页 UI，仅在 `useUIStore` 上预留 `backdropVariant` 字段。
 
-## 9. 测试
+## 9. 测试 / 验收
 
-| 层级 | 内容 |
+项目当前未引入 vitest / jest / playwright（已确认 `apps/desktop/package.json` 与根 `package.json` 无相关依赖）。本期不引入新测试框架，采用手动验收：
+
+| 验收项 | 方式 |
 |---|---|
-| 单元 | `NavCapsule` hover 切换：label `aria-expanded` / 容器宽度类名 |
-| 单元 | `mockProjects` 排序：按 `openedAt` 倒序 |
-| 单元 | `NewProjectCapsule` 点击：`onClick` 触发 navigate |
-| 集成 | 点击导航胶囊 → URL 切换为对应路径 |
-| 集成 | AI 输入提交 → console 打印（不接真后端） |
-| 视觉 | Playwright 截图 Header + DashboardHome（1440×900 视口） |
-
-不引入新的测试框架，沿用项目现有 vitest（若有）/ 不加测试时仅做手动截图。
+| `NavCapsule` hover 展开 | 启动 `tauri:dev`，肉眼确认宽度变化 + label 渐显 |
+| `NavCapsule` 激活态 | 肉眼确认背景色 + 外发光 + 始终显 label |
+| 导航跳转 | 点击 4 个胶囊，地址栏 URL 变化到 `/app/home\|workspace\|assets\|templates` |
+| 项目胶囊点击 | 跳 `/app/workspace/:id` 占位页 |
+| 新建项目点击 | 跳 `/app/workspace/new` 占位页 |
+| AI 输入提交 | 在控制台看到输入字符串（不接真后端） |
+| 断点行为 | 拖动窗口到 < 640px，导航胶囊不展开 label |
+| 降级 | 系统开启"减少动效"后，背景流光停止，仅显点阵 |
+| 视觉 | 启动后截图 Header + DashboardHome（1440×900 与 1280×720 两档） |
 
 ## 10. 实施切片
 
