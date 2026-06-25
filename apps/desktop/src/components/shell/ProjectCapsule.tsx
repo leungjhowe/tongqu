@@ -1,4 +1,3 @@
-import { Capsule } from "@tps/ui";
 import { FolderOpen } from "lucide-react";
 import type { Project } from "@/data/mockProjects";
 
@@ -23,30 +22,27 @@ function relativeTime(iso: string): string {
 export default function ProjectCapsule({ project, onOpen }: ProjectCapsuleProps) {
   const bg = `hsl(${project.thumbnailHue} 70% 35%)`;
   return (
-    <Capsule
-      as="button"
+    <button
+      type="button"
       onClick={() => onOpen(project.id)}
-      alwaysShowLabel
-      label={
-        <span className="flex flex-col items-start leading-tight max-w-[200px]">
-          <span className="text-sm text-foreground whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px]">
-            {project.name}
-          </span>
-          <span className="text-[11px] text-muted-foreground whitespace-nowrap">
-            {relativeTime(project.openedAt)}
-          </span>
-        </span>
-      }
-      icon={
-        <span
-          className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0"
-          style={{ background: bg }}
-          aria-hidden
-        >
-          <FolderOpen className="w-3.5 h-3.5 text-white/80" />
-        </span>
-      }
       title={project.name}
-    />
+      className="group flex flex-col w-[200px] h-[150px] rounded-xl overflow-hidden border border-[hsl(var(--capsule-border))] bg-[hsl(var(--capsule-bg)/0.7)] hover:border-[hsl(var(--capsule-border-active))] hover:scale-[1.02] transition-[transform,border-color] duration-200 cursor-pointer text-left"
+    >
+      <span
+        className="relative flex-1 flex items-center justify-center group-hover:brightness-110 transition-[filter] duration-200"
+        style={{ background: bg }}
+        aria-hidden
+      >
+        <FolderOpen className="w-8 h-8 text-white/85" />
+      </span>
+      <span className="flex flex-col gap-0.5 px-3 py-2 min-h-[60px]">
+        <span className="text-sm font-medium text-foreground truncate">
+          {project.name}
+        </span>
+        <span className="text-[11px] text-muted-foreground truncate">
+          {relativeTime(project.openedAt)}
+        </span>
+      </span>
+    </button>
   );
 }

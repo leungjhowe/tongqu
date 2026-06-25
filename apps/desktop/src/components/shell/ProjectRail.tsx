@@ -13,7 +13,7 @@ export default function ProjectRail({ projects, onOpen, onNew }: ProjectRailProp
   const isEmpty = list.length === 0;
 
   return (
-    <div className="w-full max-w-5xl">
+    <div className="w-full max-w-2xl">
       {isEmpty ? (
         <div className="flex items-center justify-center py-8">
           <div className="capsule cursor-default" data-always-show-label="true">
@@ -24,18 +24,10 @@ export default function ProjectRail({ projects, onOpen, onNew }: ProjectRailProp
         </div>
       ) : (
         <div
-          className="relative overflow-x-auto overflow-y-hidden -mx-3 px-3 py-2"
-          style={{ scrollbarWidth: "thin" }}
+          aria-label="最近项目横向列表"
+          className="scroll-area w-full overflow-x-auto overflow-y-hidden px-1 py-2"
         >
-          {/* Left fade mask */}
-          <div
-            aria-hidden
-            className="sticky left-0 top-0 bottom-0 w-8 -ml-3 pointer-events-none"
-            style={{
-              background: "linear-gradient(to right, hsl(var(--background)) 0%, transparent 100%)",
-            }}
-          />
-          <div className="flex items-center gap-2 min-w-min">
+          <div className="flex items-stretch gap-3 min-w-min">
             <NewProjectCapsule onClick={onNew} />
             {list.map((p) => (
               <ProjectCapsule key={p.id} project={p} onOpen={onOpen} />
