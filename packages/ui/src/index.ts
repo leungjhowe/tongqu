@@ -18,3 +18,6 @@ export type { ChatPanelMessage, ChatPanelProps } from './components/ChatPanel';
 
 export { Capsule } from './components/Capsule';
 export type { CapsuleProps } from './components/Capsule';
+
+export { AutoTextarea } from './components/AutoTextarea';
+export type { AutoTextareaProps } from './components/AutoTextarea';

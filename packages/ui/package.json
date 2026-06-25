@@ -29,9 +29,10 @@
   },
   "dependencies": {
     "@tps/shared": "workspace:*",
+    "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.4",
-    "class-variance-authority": "^0.7.0"
+    "react-textarea-autosize": "^8.5.9",
+    "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
     "@types/react": "^18.3.11",
