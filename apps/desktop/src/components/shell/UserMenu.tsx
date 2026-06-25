@@ -39,7 +39,7 @@ export default function UserMenu() {
           </span>
         }
         label={
-          <span className="text-sm text-foreground whitespace-nowrap max-w-[120px] overflow-hidden text-ellipsis">
+          <span className="text-base text-foreground whitespace-nowrap max-w-[120px] overflow-hidden text-ellipsis">
             {username || "访客"}
           </span>
         }

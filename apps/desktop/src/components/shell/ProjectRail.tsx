@@ -17,7 +17,7 @@ export default function ProjectRail({ projects, onOpen, onNew }: ProjectRailProp
       {isEmpty ? (
         <div className="flex items-center justify-center py-8">
           <div className="capsule cursor-default" data-always-show-label="true">
-            <span className="capsule__label text-sm text-muted-foreground">
+            <span className="capsule__label text-base text-muted-foreground">
               暂无历史项目，去新建一个 →
             </span>
           </div>

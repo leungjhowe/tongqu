@@ -18,7 +18,7 @@ export default function Logo({ onClick }: LogoProps) {
           TP
         </span>
       }
-      label={<span className="text-sm text-foreground whitespace-nowrap">{APP_NAME}</span>}
+      label={<span className="text-base text-foreground whitespace-nowrap">{APP_NAME}</span>}
     />
   );
 }

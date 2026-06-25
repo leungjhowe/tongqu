@@ -17,7 +17,7 @@ export default function NavCapsule({ navKey, label, icon, active, onSelect }: Na
       active={active}
       alwaysShowLabel
       icon={icon}
-      label={<span className="text-sm whitespace-nowrap">{label}</span>}
+      label={<span className="text-base whitespace-nowrap">{label}</span>}
       onClick={() => onSelect(navKey)}
       aria-current={active ? "page" : undefined}
       title={label}
