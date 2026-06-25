@@ -1,6 +1,6 @@
 import { type KeyboardEvent } from "react";
-import { AutoTextarea, Capsule } from "@tps/ui";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { AutoTextarea } from "@tps/ui";
+import { Paperclip, Image as ImageIcon, AtSign, Mic, ArrowUp } from "lucide-react";
 import { useUIStore } from "@/stores/uiStore";
 
 export default function AiPromptCapsule() {
@@ -10,7 +10,6 @@ export default function AiPromptCapsule() {
   const submit = () => {
     const v = value.trim();
     if (!v) return;
-    // 本轮占位：仅打印到 console，未来接 @tps/ai-core
     // eslint-disable-next-line no-console
     console.log("[AiPrompt] submit:", v);
     setValue("");
@@ -23,33 +22,48 @@ export default function AiPromptCapsule() {
     }
   };
 
+  const canSend = value.trim().length > 0;
+
   return (
-    <Capsule
-      as="div"
-      className="w-full max-w-2xl min-h-14 px-4 py-2 gap-3 items-center"
-      icon={<Sparkles className="w-5 h-5 text-primary flex-shrink-0" aria-hidden />}
-      focusGlow
-    >
+    <div className="w-full max-w-2xl sm:max-w-3xl lg:max-w-4xl rounded-2xl border border-border bg-card/70 backdrop-blur-md p-3 transition-[border-color,box-shadow] duration-200 focus-within:border-primary focus-within:shadow-[0_0_12px_hsl(var(--capsule-glow))]">
       <AutoTextarea
-        minRows={1}
-        maxRows={6}
+        minRows={2}
+        maxRows={5}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={onKeyDown}
         placeholder="问点什么吧…  Enter 发送 · Shift+Enter 换行"
         aria-label="AI 提示词输入"
-        className="flex-1 text-base text-foreground placeholder:text-muted-foreground py-1"
+        className="w-full text-base text-foreground placeholder:text-muted-foreground px-1 py-1"
       />
-      <button
-        type="button"
-        onClick={submit}
-        disabled={!value.trim()}
-        aria-label="发送"
-        title="发送 (Enter)"
-        className="w-9 h-9 rounded-full flex items-center justify-center bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-opacity hover:opacity-90 flex-shrink-0"
-      >
-        <ArrowRight className="w-4 h-4" aria-hidden />
-      </button>
-    </Capsule>
+      <div className="mt-2 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1" role="toolbar" aria-label="附加工具">
+          <button type="button" title="附件" aria-label="附件" className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">
+            <Paperclip className="w-4 h-4" aria-hidden />
+          </button>
+          <button type="button" title="图片" aria-label="图片" className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">
+            <ImageIcon className="w-4 h-4" aria-hidden />
+          </button>
+          <button type="button" title="提及项目" aria-label="提及项目" className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">
+            <AtSign className="w-4 h-4" aria-hidden />
+          </button>
+        </div>
+        <div className="flex items-center gap-1">
+          <button type="button" title="语音输入" aria-label="语音输入" className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">
+            <Mic className="w-4 h-4" aria-hidden />
+          </button>
+          <button
+            type="button"
+            onClick={submit}
+            disabled={!canSend}
+            title="发送 (Enter)"
+            aria-label="发送"
+            className="w-8 h-8 rounded-md flex items-center justify-center bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-opacity hover:opacity-90"
+          >
+            <ArrowUp className="w-4 h-4" aria-hidden />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

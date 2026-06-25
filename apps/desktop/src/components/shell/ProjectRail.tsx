@@ -6,9 +6,10 @@ interface ProjectRailProps {
   projects?: Project[];
   onOpen: (id: string) => void;
   onNew: () => void;
+  onAll: () => void;
 }
 
-export default function ProjectRail({ projects, onOpen, onNew }: ProjectRailProps) {
+export default function ProjectRail({ projects, onOpen, onNew, onAll }: ProjectRailProps) {
   const list = projects ?? MOCK_PROJECTS;
   const isEmpty = list.length === 0;
 
