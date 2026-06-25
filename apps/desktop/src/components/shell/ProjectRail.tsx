@@ -26,7 +26,7 @@ export default function ProjectRail({ projects, onOpen, onNew, onAll }: ProjectR
       ) : (
         <div
           aria-label="最近项目横向列表"
-          className="scroll-area w-full overflow-x-auto overflow-y-hidden px-1 py-2"
+          className="w-full overflow-x-auto overflow-y-hidden px-1 py-2"
         >
           <div className="flex items-stretch gap-3 min-w-min">
             <NewProjectCapsule onClick={onNew} />
