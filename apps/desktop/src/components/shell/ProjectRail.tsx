@@ -24,7 +24,7 @@ export default function ProjectRail({ projects, onOpen, onNew, onAll }: ProjectR
         </div>
       ) : (
         <>
-          <div className="flex items-stretch gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             <NewProjectCapsule onClick={onNew} />
             {recent.map((p) => (
               <ProjectCapsule key={p.id} project={p} onOpen={onOpen} />

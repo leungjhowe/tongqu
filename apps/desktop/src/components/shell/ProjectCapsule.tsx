@@ -27,7 +27,7 @@ export default function ProjectCapsule({ project, onOpen }: ProjectCapsuleProps)
       type="button"
       onClick={() => onOpen(project.id)}
       title={project.name}
-      className="group flex flex-col w-[200px] h-[150px] rounded-lg overflow-hidden border border-capsule-border bg-capsule-bg/0.7 hover:border-capsule-border-active hover:scale-[1.02] transition-[transform,border-color] duration-base cursor-pointer text-left"
+      className="group flex flex-col w-full h-[150px] rounded-lg overflow-hidden border border-capsule-border bg-capsule-bg/0.7 hover:border-capsule-border-active hover:scale-[1.02] transition-[transform,border-color] duration-base cursor-pointer text-left"
     >
       <span
         className="relative flex-1 flex items-center justify-center group-hover:brightness-110 transition-[filter] duration-base"
