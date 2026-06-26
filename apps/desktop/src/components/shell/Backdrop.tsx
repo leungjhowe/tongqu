@@ -7,7 +7,7 @@ gsap.registerPlugin(useGSAP);
 import { useUIStore, type BackdropVariant } from "@/stores/uiStore";
 
 const FLOW_COLORS = [
-  "hsl(217 91% 60%)",
+  "hsl(var(--primary))",
   "hsl(217 95% 72%)",
   "hsl(217 91% 48%)",
   "hsl(195 88% 62%)",
@@ -225,14 +225,14 @@ function GridBackdrop() {
         </defs>
         <rect width="100%" height="100%" fill="url(#shell-grid-dots)" />
         {/* Few faint connection lines */}
-        <g stroke="hsl(var(--border))" strokeWidth={1} strokeDasharray="4 4" strokeOpacity={0.6}>
+        <g className="stroke-border" strokeWidth={1} strokeDasharray="4 4" strokeOpacity={0.6}>
           <line x1="18%" y1="22%" x2="42%" y2="38%" />
           <line x1="42%" y1="38%" x2="64%" y2="30%" />
           <line x1="64%" y1="30%" x2="82%" y2="52%" />
           <line x1="30%" y1="68%" x2="52%" y2="58%" />
           <line x1="52%" y1="58%" x2="72%" y2="72%" />
         </g>
-        <g fill="hsl(var(--background))" stroke="hsl(var(--border))" strokeWidth={1.5}>
+        <g className="fill-background stroke-border" strokeWidth={1.5}>
           <circle cx="18%" cy="22%" r={4} />
           <circle cx="42%" cy="38%" r={4} />
           <circle cx="64%" cy="30%" r={4} />
