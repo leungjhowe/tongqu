@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getActiveProjects,
   createProject,
@@ -24,6 +25,7 @@ function relativeTime(iso: Date | number | string | null): string {
 }
 
 export default function WorkspacePage() {
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const [projects, setProjects] = useState<Project[]>([]);
   const [query, setQuery] = useState("");
@@ -65,7 +67,7 @@ export default function WorkspacePage() {
   const handleCreated = async (project: Project) => {
     setModalOpen(false);
     await reload();
-    window.location.href = `/app/workspace/${project.id}`;
+    navigate(`/app/workspace/${project.id}`, { replace: true });
   };
 
   const filtered = query.trim()
