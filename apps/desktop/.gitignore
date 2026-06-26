@@ -34,3 +34,6 @@ src-tauri/target
 .env
 .env.local
 .env.*.local
+
+# Local DB (drizzle/libsql)
+.data/
