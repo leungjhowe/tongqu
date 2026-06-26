@@ -33,3 +33,6 @@ Thumbs.db
 
 # Tauri-generated icon placeholders we don't want to commit
 apps/desktop/src-tauri/icons/*.bak
+# Playwright test artifacts
+test-results/
+playwright-report/
