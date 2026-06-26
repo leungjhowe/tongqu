@@ -1,12 +1,13 @@
 import { FolderOpen } from "lucide-react";
-import type { Project } from "@/data/mockProjects";
+import type { Project } from "@tps/data-core";
 
 interface ProjectCapsuleProps {
   project: Project;
   onOpen: (id: string) => void;
 }
 
-function relativeTime(iso: string): string {
+function relativeTime(iso: Date | number | string | null): string {
+  if (iso == null) return "未知";
   const now = Date.now();
   const then = new Date(iso).getTime();
   const diffSec = Math.max(0, Math.floor((now - then) / 1000));

@@ -1,10 +1,10 @@
 import { ArrowRight } from "lucide-react";
-import { MOCK_PROJECTS, type Project } from "@/data/mockProjects";
+import type { Project } from "@tps/data-core";
 import NewProjectCapsule from "./NewProjectCapsule";
 import ProjectCapsule from "./ProjectCapsule";
 
 interface ProjectRailProps {
-  projects?: Project[];          // optional override
+  projects: Project[];
   onOpen: (id: string) => void;
   onNew: () => void;
   onAll: () => void;
@@ -13,9 +13,8 @@ interface ProjectRailProps {
 const MAX_RECENT = 3;
 
 export default function ProjectRail({ projects, onOpen, onNew, onAll }: ProjectRailProps) {
-  const all = projects ?? MOCK_PROJECTS;
-  const isEmpty = all.length === 0;
-  const recent = all.slice(0, MAX_RECENT);
+  const isEmpty = projects.length === 0;
+  const recent = projects.slice(0, MAX_RECENT);
 
   return (
     <div className="w-full">

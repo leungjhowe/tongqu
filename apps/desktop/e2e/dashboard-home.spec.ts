@@ -1,12 +1,9 @@
 import { test, expect, type Page } from "@playwright/test";
 
-/** Mock auth: any non-empty username/password succeeds. */
 async function login(page: Page) {
   await page.goto("/login");
-  // FloatingInput wires <label htmlFor> to <input id> via React useId,
-  // so getByLabel can resolve the field by its accessible name.
-  await page.getByLabel("用户名").fill("tester");
-  await page.getByLabel("密码").fill("any");
+  await page.getByLabel("用户名").fill("admin");
+  await page.getByLabel("密码").fill("admin123");
   await page.getByRole("button", { name: /进入系统/ }).click();
   await page.waitForURL(/\/app/);
 }
@@ -35,16 +32,9 @@ test.describe("/app/home dashboard", () => {
     // Hero 标题
     await expect(page.getByRole("heading", { name: /今天要做什么/ })).toBeVisible();
 
-    // 4 个项目卡：1 新建 + 3 最近
-    await expect(page.getByRole("button", { name: /新建项目/ })).toBeVisible();
-    await expect(page.getByText("滨海新城交通评估")).toBeVisible();
-    await expect(page.getByText("东莞地铁 12 号线规划")).toBeVisible();
-    await expect(page.getByText("松山湖通勤 OD 矩阵")).toBeVisible();
-    // 第 4 个（虎门港物流通道仿真）不应该可见 — 我们只显示 3 个最近
-    await expect(page.getByText("虎门港物流通道仿真")).not.toBeVisible();
-
-    // "所有项目" 链接
-    await expect(page.getByRole("button", { name: /所有项目/ })).toBeVisible();
+    // admin 没有项目，显示空态
+    await expect(page.getByText(/暂无历史项目/)).toBeVisible();
+    await expect(page.getByRole("button", { name: /新建一个/ })).toBeVisible();
 
     // 截图（2K 视口）
     await page.screenshot({
@@ -78,7 +68,7 @@ test.describe("/app/home dashboard", () => {
     // 工作空间
     await nav.getByRole("button", { name: /工作空间/ }).click();
     await expect(page).toHaveURL(/\/app\/workspace/);
-    await expect(page.getByRole("heading", { name: "工作空间" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /\+ 新建项目/ })).toBeVisible();
 
     // 回主页
     await page.goto("/app/home");
@@ -96,21 +86,23 @@ test.describe("/app/home dashboard", () => {
     await expect(page.getByRole("heading", { name: "模板" })).toBeVisible();
   });
 
-  test("点击历史项目卡 → /app/workspace/:id", async ({ page }) => {
+  test("无项目时显示空态", async ({ page }) => {
     await login(page);
-    await page.getByText("滨海新城交通评估").first().click();
-    await expect(page).toHaveURL(/\/app\/workspace\/p-001/);
+    await expect(page.getByText(/暂无历史项目/)).toBeVisible();
   });
 
-  test("点击新建项目 → /app/workspace/new", async ({ page }) => {
+  test("点击新建项目弹出 modal", async ({ page }) => {
     await login(page);
-    await page.getByRole("button", { name: /新建项目/ }).click();
-    await expect(page).toHaveURL(/\/app\/workspace\/new/);
+    // admin 没有项目，点空态里的"新建一个"按钮触发 modal
+    await page.getByRole("button", { name: /新建一个/ }).click();
+    await expect(page.getByRole("dialog", { name: /新建项目/ })).toBeVisible();
   });
 
   test("点击所有项目 → /app/workspace", async ({ page }) => {
     await login(page);
-    await page.getByRole("button", { name: /所有项目/ }).click();
-    await expect(page).toHaveURL(/\/app\/workspace$/);
+    const nav = page.locator('nav[aria-label="主导航"]');
+    await nav.getByRole("button", { name: /工作空间/ }).click();
+    await expect(page).toHaveURL(/\/app\/workspace/);
+    await expect(page.getByRole("button", { name: /\+ 新建项目/ })).toBeVisible();
   });
 });

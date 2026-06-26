@@ -10,4 +10,6 @@ export { default as NewProjectCapsule } from "./NewProjectCapsule";
 export { default as ProjectCapsule } from "./ProjectCapsule";
 export { default as ProjectRail } from "./ProjectRail";
 export { default as DashboardHome } from "./DashboardHome";
+export { default as WorkspacePage } from "./WorkspacePage";
+export { default as NewProjectModal } from "./NewProjectModal";
 export { default as ComingSoon } from "./ComingSoon";
