@@ -252,7 +252,7 @@ function MetricCard({ label, value, format = "plain", accent = "primary" }: Metr
         aria-hidden
         className={`absolute top-0 left-0 right-0 h-px bg-gradient-to-r ${accentClass}`}
       />
-      <div className="text-[10px] font-mono uppercase tracking-[0.16em] text-muted-foreground/70 leading-tight mb-2 min-h-[28px]">
+      <div className="text-micro font-mono uppercase tracking-[0.16em] text-muted-foreground/70 leading-tight mb-2 min-h-[28px]">
         {firstWord}
         {restLabel && (
           <>
@@ -324,7 +324,7 @@ function FloatingInput({
         className={
           "pointer-events-none absolute left-0 origin-left transition-all duration-200 ease-out " +
           (floating
-            ? "top-0 text-[11px] tracking-wider uppercase font-medium " +
+            ? "top-0 text-caption tracking-wider uppercase font-medium " +
               (showError ? "text-destructive" : "text-primary")
             : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground")
         }
@@ -335,7 +335,7 @@ function FloatingInput({
       <span
         aria-hidden
         className={
-          "pointer-events-none absolute left-0 right-0 bottom-0 h-px origin-left transition-transform duration-300 ease-out " +
+          "pointer-events-none absolute left-0 right-0 bottom-0 h-px origin-left transition-transform duration-slow ease-out " +
           (focused
             ? "scale-x-100 " + (showError ? "bg-destructive" : "bg-primary")
             : "scale-x-0 bg-transparent")
@@ -344,7 +344,7 @@ function FloatingInput({
       />
       {/* Tiny inline error text. */}
       {showError && (
-        <span className="mt-1 text-[11px] text-destructive/90 flex items-center gap-1">
+        <span className="mt-1 text-caption text-destructive/90 flex items-center gap-1">
           <span className="w-1 h-1 rounded-full bg-destructive animate-pulse" />
           {error}
         </span>
@@ -1065,7 +1065,7 @@ export default function Login() {
         className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[640px] will-change-transform"
         style={{
           background:
-            "radial-gradient(circle at center, hsl(217 91% 60% / 0.18) 0%, hsl(217 91% 60% / 0.06) 35%, transparent 70%)",
+            "radial-gradient(circle at center, hsl(var(--primary) / 0.18) 0%, hsl(var(--primary) / 0.06) 35%, transparent 70%)",
           filter: "blur(40px)",
         }}
       />
@@ -1078,7 +1078,7 @@ export default function Login() {
         className="relative z-10 h-12 flex-shrink-0 flex items-center justify-between px-4 sm:px-6 border-b border-border/60 bg-card/30 backdrop-blur"
       >
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="w-6 h-6 rounded bg-primary text-primary-foreground flex items-center justify-center text-[11px] font-bold tracking-wider shrink-0">
+          <div className="w-6 h-6 rounded bg-primary text-primary-foreground flex items-center justify-center text-caption font-bold tracking-wider shrink-0">
             TP
           </div>
           <div className="text-sm text-foreground/90 truncate hidden sm:inline">
@@ -1086,7 +1086,7 @@ export default function Login() {
           </div>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground/70 shrink-0">
-          <CircleDot className="w-3 h-3 text-emerald-500" />
+          <CircleDot className="w-3 h-3 text-success" />
           <span className="hidden sm:inline">系统就绪</span>
           <span className="hidden md:inline mx-2 h-3 w-px bg-border" />
           <span className="hidden md:inline font-mono tabular-nums text-muted-foreground/60">
@@ -1116,12 +1116,12 @@ export default function Login() {
                     className="absolute inset-0 rounded-lg opacity-50"
                     style={{
                       background:
-                        "linear-gradient(135deg, transparent 50%, hsl(217 91% 75% / 0.6))",
+                        "linear-gradient(135deg, transparent 50%, hsl(var(--primary-hover) / 0.6))",
                     }}
                   />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground/70">
+                  <span className="text-micro font-mono uppercase tracking-[0.2em] text-muted-foreground/70">
                     智能工作流平台
                   </span>
                   <span className="text-xs font-mono text-foreground/80">
@@ -1129,10 +1129,10 @@ export default function Login() {
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.18em] text-emerald-500">
+              <div className="flex items-center gap-2 text-micro font-mono uppercase tracking-[0.18em] text-success">
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-60" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                  <span className="absolute inset-0 rounded-full bg-success animate-ping opacity-60" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
                 </span>
                 <span>system online</span>
               </div>
@@ -1142,13 +1142,13 @@ export default function Login() {
             <div className="flex flex-col gap-4">
               <div
                 data-anim="brand-headline"
-                className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-primary/80"
+                className="flex items-center gap-2 text-micro font-mono uppercase tracking-[0.2em] text-primary/80"
               >
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                 <span>AI · GIS · Workflow</span>
               </div>
               <h1
-                className="text-3xl lg:text-5xl font-semibold tracking-tight leading-[1.1]"
+                className="text-display-md lg:text-display-lg font-semibold leading-tight"
                 style={{ textWrap: "balance" }}
               >
                 <span
@@ -1167,7 +1167,7 @@ export default function Login() {
               </h1>
               <p
                 data-anim="brand-sub"
-                className="text-sm lg:text-base text-muted-foreground leading-relaxed max-w-md"
+                className="text-body lg:text-body-lg text-muted-foreground max-w-md"
               >
                 面向交通规划行业的 AI 驱动操作系统，将可视化工作流、自然语言生成与 GIS 数据分析整合在一个工作台中。
               </p>
@@ -1282,7 +1282,7 @@ export default function Login() {
                         cx={n.x}
                         cy={n.y}
                         r={n.size}
-                        fill="hsl(217 91% 60%)"
+                        fill="hsl(var(--primary))"
                         stroke="hsl(var(--background))"
                         strokeWidth="2"
                       />
@@ -1324,10 +1324,10 @@ export default function Login() {
               {/* Live data strip */}
               <div
                 data-anim="status-strip"
-                className="absolute left-3 right-3 bottom-3 flex items-center gap-3 px-3 py-2 rounded-md bg-background/60 backdrop-blur border border-border/50 text-[10px] font-mono tabular-nums text-muted-foreground"
+                className="absolute left-3 right-3 bottom-3 flex items-center gap-3 px-3 py-2 rounded-md bg-background/60 backdrop-blur border border-border/50 text-micro font-mono tabular-nums text-muted-foreground"
               >
                 <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
                   <span className="text-foreground/80">LIVE</span>
                 </span>
                 <span className="text-border">|</span>
@@ -1341,7 +1341,7 @@ export default function Login() {
 
             <div
               data-anim="brand-meta"
-              className="flex items-center justify-between gap-4 text-[11px] font-mono uppercase tracking-wider text-muted-foreground/50 max-w-md"
+              className="flex items-center justify-between gap-4 text-micro font-mono uppercase tracking-wider text-muted-foreground/50 max-w-md"
             >
               <span>build a1f2c8 · {stamp}</span>
               <span>local</span>
@@ -1365,7 +1365,7 @@ export default function Login() {
             {/* Hover halo around the card border. */}
             <div
               aria-hidden
-              className="pointer-events-none absolute -inset-px rounded-xl opacity-0 group-hover/form:opacity-100 transition-opacity duration-500"
+              className="pointer-events-none absolute -inset-px rounded-xl opacity-0 group-hover/form:opacity-100 transition-opacity duration-slower"
               style={{
                 background:
                   "linear-gradient(135deg, hsl(217 91% 60% / 0.3), transparent 40%, hsl(195 88% 62% / 0.2))",
@@ -1380,16 +1380,16 @@ export default function Login() {
 
             {/* Header */}
             <div data-anim="form-child" className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-primary/80">
+              <div className="flex items-center gap-2 text-micro font-mono uppercase tracking-[0.2em] text-primary/80">
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-60" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span className="absolute inset-0 rounded-full bg-success animate-ping opacity-60" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
                 </span>
                 <span>安全会话</span>
                 <span className="text-border">/</span>
                 <span className="text-muted-foreground/60">TLS 1.3</span>
               </div>
-              <h2 className="text-2xl font-semibold text-foreground tracking-tight">
+              <h2 className="text-h1 text-foreground">
                 登录系统
               </h2>
               <p className="text-sm text-muted-foreground">
@@ -1461,7 +1461,7 @@ export default function Login() {
               onMouseLeave={onSubmitLeave}
               onMouseDown={onSubmitDown}
               onMouseUp={onSubmitUp}
-              className="group/submit relative mt-2 flex items-center justify-center gap-2 w-full h-11 rounded-md border border-primary/50 bg-primary/15 hover:bg-primary/25 hover:border-primary focus-visible:border-primary focus-visible:bg-primary/25 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-card text-primary text-sm font-medium transition-colors duration-150 disabled:opacity-80 disabled:cursor-not-allowed will-change-transform overflow-hidden outline-none"
+              className="group/submit relative mt-2 flex items-center justify-center gap-2 w-full h-11 rounded-md border border-primary/50 bg-primary/15 hover:bg-primary/25 hover:border-primary focus-visible:border-primary focus-visible:bg-primary/25 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-card text-primary text-sm font-medium transition-colors duration-fast disabled:opacity-80 disabled:cursor-not-allowed will-change-transform overflow-hidden outline-none"
             >
               {/* Top inner highlight */}
               <span
@@ -1521,10 +1521,10 @@ export default function Login() {
             {/* Footer trust line */}
             <div
               data-anim="form-foot"
-              className="flex items-center justify-between text-[11px] text-muted-foreground/60"
+              className="flex items-center justify-between text-caption text-muted-foreground/60"
             >
               <span className="flex items-center gap-1.5">
-                <CircleDot className="w-3 h-3 text-emerald-500/80" />
+                <CircleDot className="w-3 h-3 text-success/80" />
                 本地模式
               </span>
               <span className="font-mono tabular-nums">v0.1.0</span>
