@@ -22,7 +22,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80 select-none"
+            className="text-caption font-medium uppercase tracking-wider text-muted-foreground/80 select-none"
           >
             {label}
           </label>
@@ -39,9 +39,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             'bg-transparent border border-border/70 text-foreground',
             'placeholder:text-muted-foreground/50',
             // interactions
-            'transition-all duration-150',
+            'transition-all duration-fast',
             'hover:border-border',
-            'focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30',
+            'focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/60',
             // disabled
             'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-border/70',
             // file input bits (rarely used but tidy)
