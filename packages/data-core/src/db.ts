@@ -3,12 +3,13 @@ import { drizzle } from 'drizzle-orm/libsql';
 import { migrate } from 'drizzle-orm/libsql/migrator';
 import * as schema from './schema';
 
-const DB_PATH = 'apps/desktop/.data/app.db';
+/** libsql HTTP server URL. Browser bundle only accepts libsql:/wss:/ws:/https:/http: schemes. */
+const SERVER_URL = 'http://localhost:8080';
 
-/** libsql client — 单例。 */
-export const client = createClient({ url: `file:${DB_PATH}` });
+/** libsql client — connects to local libsql server via HTTP. */
+export const client = createClient({ url: SERVER_URL });
 
-/** drizzle 实例，绑定 schema。 */
+/** drizzle instance, bound to schema. */
 export const db = drizzle(client, { schema });
 
 /** 启动时调用一次：跑迁移。 */

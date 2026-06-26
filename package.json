@@ -9,7 +9,9 @@
     "tauri:dev": "pnpm --filter @tps/desktop tauri:dev",
     "tauri:build": "pnpm --filter @tps/desktop tauri:build",
     "lint": "pnpm -r --parallel lint",
-    "clean": "pnpm -r --parallel clean"
+    "clean": "pnpm -r --parallel clean",
+    "db:server": "node scripts/start-libsql-server.mjs",
+    "db:dev": "concurrently -n server,vite -c blue,green \"pnpm db:server\" \"pnpm dev\""
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {
@@ -17,15 +19,17 @@
     "pnpm": ">=9"
   },
   "dependencies": {
+    "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.4",
-    "class-variance-authority": "^0.7.0"
+    "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
-    "sass": "^1.79.4",
-    "unocss": "^0.62.4",
-    "@unocss/preset-uno": "^0.62.4",
     "@unocss/preset-icons": "^0.62.4",
-    "@unocss/reset": "^0.62.4"
+    "@unocss/preset-uno": "^0.62.4",
+    "@unocss/reset": "^0.62.4",
+    "concurrently": "^10.0.3",
+    "sass": "^1.79.4",
+    "sqld": "0.24.1-pre.42",
+    "unocss": "^0.62.4"
   }
 }
