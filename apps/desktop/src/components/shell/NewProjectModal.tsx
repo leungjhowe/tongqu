@@ -50,13 +50,13 @@ export default function NewProjectModal({ open, onClose, onCreated }: NewProject
       role="dialog"
       aria-modal="true"
       aria-label="新建项目"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur-sm"
+      className="fixed inset-0 z-modal flex items-center justify-center bg-background/70 backdrop-blur-sm"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-5 shadow-lg">
-        <h2 className="text-base font-semibold text-foreground mb-3">新建项目</h2>
+      <div className="w-full max-w-sm rounded-xl border border-border bg-card p-5 shadow-elevation-3">
+        <h2 className="text-display-md text-foreground mb-3">新建项目</h2>
         <input
           ref={inputRef}
           type="text"
@@ -73,7 +73,7 @@ export default function NewProjectModal({ open, onClose, onCreated }: NewProject
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="px-4 h-9 rounded-md text-sm text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+            className="px-4 h-9 rounded-md text-button text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors duration-fast"
           >
             取消
           </button>
@@ -81,7 +81,7 @@ export default function NewProjectModal({ open, onClose, onCreated }: NewProject
             type="button"
             onClick={submit}
             disabled={!name.trim() || submitting}
-            className="px-4 h-9 rounded-md text-sm bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-opacity hover:opacity-90"
+            className="px-4 h-9 rounded-md text-button bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-fast hover:bg-primary-hover"
           >
             创建
           </button>

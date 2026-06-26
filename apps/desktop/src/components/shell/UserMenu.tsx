@@ -39,7 +39,7 @@ export default function UserMenu() {
           </span>
         }
         label={
-          <span className="text-base text-foreground whitespace-nowrap max-w-[120px] overflow-hidden text-ellipsis">
+          <span className="text-body-lg text-foreground whitespace-nowrap max-w-[120px] overflow-hidden text-ellipsis">
             {username || "访客"}
           </span>
         }
@@ -50,7 +50,7 @@ export default function UserMenu() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-[calc(100%+6px)] z-50 min-w-[160px] py-1 rounded-md border border-border bg-card text-card-foreground shadow-md"
+          className="absolute right-0 top-[calc(100%+6px)] z-floating min-w-[160px] py-1 rounded-md border border-border bg-card text-card-foreground shadow-elevation-2"
         >
           <button
             type="button"
@@ -59,7 +59,7 @@ export default function UserMenu() {
               setOpen(false);
               // 设置页路由未启用，先静默关闭
             }}
-            className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+            className="w-full flex items-center gap-2 px-3 py-1.5 text-body text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors duration-fast"
           >
             <Settings className="w-3.5 h-3.5" aria-hidden />
             设置
@@ -68,7 +68,7 @@ export default function UserMenu() {
             type="button"
             role="menuitem"
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+            className="w-full flex items-center gap-2 px-3 py-1.5 text-body text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors duration-fast"
           >
             <LogOut className="w-3.5 h-3.5" aria-hidden />
             退出登录

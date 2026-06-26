@@ -19,7 +19,7 @@ export default function ProjectRail({ projects, onOpen, onNew, onAll }: ProjectR
   return (
     <div className="w-full">
       {isEmpty ? (
-        <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
+        <div className="flex items-center justify-center py-8 text-body text-muted-foreground">
           暂无历史项目，去<button onClick={onNew} className="ml-1 text-primary hover:underline">新建一个</button>
         </div>
       ) : (
@@ -34,7 +34,7 @@ export default function ProjectRail({ projects, onOpen, onNew, onAll }: ProjectR
             <button
               type="button"
               onClick={onAll}
-              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-secondary"
+              className="inline-flex items-center gap-1.5 text-body text-muted-foreground hover:text-foreground transition-colors duration-fast px-2 py-1 rounded-md hover:bg-secondary"
               aria-label="查看所有项目"
             >
               所有项目

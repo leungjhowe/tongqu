@@ -13,12 +13,12 @@ export default function Logo({ onClick }: LogoProps) {
       icon={
         <span
           aria-hidden
-          className="w-6 h-6 rounded-md bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-bold tracking-wider"
+          className="w-6 h-6 rounded-md bg-primary text-primary-foreground flex items-center justify-center text-micro font-bold tracking-wider"
         >
           TP
         </span>
       }
-      label={<span className="text-base text-foreground whitespace-nowrap">{APP_NAME}</span>}
+      label={<span className="text-body-lg text-foreground whitespace-nowrap">{APP_NAME}</span>}
     />
   );
 }

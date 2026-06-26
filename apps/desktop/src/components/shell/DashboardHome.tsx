@@ -58,7 +58,7 @@ export default function DashboardHome() {
         <HeroHeadline />
         <AiPromptCapsule />
         {loading ? (
-          <div className="text-sm text-muted-foreground py-8">加载中...</div>
+          <div className="text-body text-muted-foreground py-8">加载中...</div>
         ) : (
           <ProjectRail projects={projects} onOpen={handleOpen} onNew={handleNew} onAll={() => {
             setActiveNav("workspace");
