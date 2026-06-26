@@ -32,9 +32,9 @@ function ToolItem({
       <button
         type="button"
         title={label}
-        className="flex items-center justify-center w-9 h-9 rounded-[var(--capsule-radius)] bg-[hsl(var(--capsule-bg)/0.7)] border border-[hsl(var(--capsule-border))] text-muted-foreground hover:text-foreground hover:bg-[hsl(var(--capsule-bg-hover)/0.85)] hover:shadow-[0_0_12px_hsl(var(--capsule-glow))] transition-all duration-base"
+        className="flex items-center justify-center w-7 h-7 rounded-[var(--capsule-radius)] bg-[hsl(var(--capsule-bg)/0.7)] border border-[hsl(var(--capsule-border))] text-muted-foreground hover:text-foreground hover:bg-[hsl(var(--capsule-bg-hover)/0.85)] hover:shadow-[0_0_8px_hsl(var(--capsule-glow))] transition-all duration-base"
       >
-        <Icon className="w-4 h-4" />
+        <Icon className="w-3.5 h-3.5" />
       </button>
       {/* 标签 — 悬停时在右侧显示 */}
       <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 hidden group-hover:block pointer-events-none z-tooltip">
@@ -87,7 +87,7 @@ function NodeTypeList({
 
 export default function WorkflowToolbar({ onAddNode }: WorkflowToolbarProps) {
   return (
-    <aside className="flex flex-col items-center gap-2 py-3 px-2 border-r border-border bg-card h-full">
+    <aside className="flex flex-col items-center gap-2.5 pt-4 pb-3 border-r border-border bg-card h-full">
       {/* 新增节点 — hover 显示节点类型列表 */}
       <ToolItem icon={Plus} label="新增节点">
         <NodeTypeList
@@ -99,7 +99,7 @@ export default function WorkflowToolbar({ onAddNode }: WorkflowToolbarProps) {
       </ToolItem>
 
       {/* 分隔线 */}
-      <div className="w-6 h-px bg-border" />
+      <div className="w-5 h-px bg-border my-0.5" />
 
       {/* 其他菜单项（占位 — 先只加菜单壳） */}
       <ToolItem icon={Search} label="节点搜索" />
