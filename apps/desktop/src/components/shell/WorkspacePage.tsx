@@ -89,7 +89,7 @@ export default function WorkspacePage() {
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+          className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg bg-primary text-primary-foreground text-button hover:bg-primary-hover transition-colors duration-fast"
         >
           + 新建项目
         </button>
