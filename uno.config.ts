@@ -68,6 +68,25 @@ export default defineConfig({
       },
       input: 'hsl(var(--input) / <alpha-value>)',
       ring: 'hsl(var(--ring) / <alpha-value>)',
+      // Spec v2 — capsule token utilities (v3 inline-color collapse).
+      // These expose --capsule-* CSS vars to UnoCSS without changing the
+      // existing .capsule class behavior.
+      capsule: {
+        bg: 'hsl(var(--capsule-bg) / <alpha-value>)',
+        'bg-hover': 'hsl(var(--capsule-bg-hover) / <alpha-value>)',
+        border: 'hsl(var(--capsule-border))',
+        'border-active': 'hsl(var(--capsule-border-active))',
+      },
+    },
+    // Spec v2 — SVG fill / stroke utilities (v3 collapse for Backdrop + Login).
+    fill: {
+      border: 'hsl(var(--border))',
+      primary: 'hsl(var(--primary))',
+      background: 'hsl(var(--background))',
+    },
+    stroke: {
+      border: 'hsl(var(--border))',
+      background: 'hsl(var(--background))',
     },
     borderRadius: {
       none: '0',
@@ -159,5 +178,12 @@ export default defineConfig({
     'shadow-glow-primary', 'shadow-glow-success', 'shadow-glow-destructive',
     'shadow-elevation-0', 'shadow-elevation-1', 'shadow-elevation-2', 'shadow-elevation-3',
     'shadow-elevation-focus',
+    // Spec v2 — capsule token utilities (commit 1).
+    'bg-capsule-bg', 'bg-capsule-bg/0.7', 'bg-capsule-bg/0.4',
+    'hover:bg-capsule-bg-hover',
+    'border-capsule-border', 'hover:border-capsule-border-active',
+    // Spec v2 — SVG fill / stroke utilities (commit 2).
+    'fill-border', 'fill-primary', 'fill-background',
+    'stroke-border', 'stroke-background',
   ],
 });
