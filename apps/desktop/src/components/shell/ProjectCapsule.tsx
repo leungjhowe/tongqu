@@ -27,20 +27,20 @@ export default function ProjectCapsule({ project, onOpen }: ProjectCapsuleProps)
       type="button"
       onClick={() => onOpen(project.id)}
       title={project.name}
-      className="group flex flex-col w-[200px] h-[150px] rounded-lg overflow-hidden border border-[hsl(var(--capsule-border))] bg-[hsl(var(--capsule-bg)/0.7)] hover:border-[hsl(var(--capsule-border-active))] hover:scale-[1.02] transition-[transform,border-color] duration-200 cursor-pointer text-left"
+      className="group flex flex-col w-[200px] h-[150px] rounded-lg overflow-hidden border border-capsule-border bg-capsule-bg/0.7 hover:border-capsule-border-active hover:scale-[1.02] transition-[transform,border-color] duration-base cursor-pointer text-left"
     >
       <span
-        className="relative flex-1 flex items-center justify-center group-hover:brightness-110 transition-[filter] duration-200"
+        className="relative flex-1 flex items-center justify-center group-hover:brightness-110 transition-[filter] duration-base"
         style={{ background: bg }}
         aria-hidden
       >
         <FolderOpen className="w-8 h-8 text-white/85" />
       </span>
       <span className="flex flex-col gap-0.5 px-3 py-2 min-h-[60px]">
-        <span className="text-sm font-medium text-foreground truncate">
+        <span className="text-body font-medium text-foreground truncate">
           {project.name}
         </span>
-        <span className="text-[11px] text-muted-foreground truncate">
+        <span className="text-micro text-muted-foreground truncate">
           {relativeTime(project.openedAt)}
         </span>
       </span>

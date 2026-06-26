@@ -25,7 +25,7 @@ export default function AiPromptCapsule() {
   const canSend = value.trim().length > 0;
 
   return (
-    <div className="w-full max-w-2xl sm:max-w-3xl lg:max-w-4xl rounded-2xl border border-border bg-card/70 backdrop-blur-md p-3 transition-[border-color,box-shadow] duration-200 focus-within:border-primary focus-within:shadow-[0_0_12px_hsl(var(--capsule-glow))]">
+    <div className="w-full max-w-2xl sm:max-w-3xl lg:max-w-4xl rounded-2xl border border-border bg-card/70 backdrop-blur-md p-3 transition-[border-color,box-shadow] duration-base focus-within:border-primary focus-within:shadow-glow-primary">
       <AutoTextarea
         minRows={2}
         maxRows={5}
