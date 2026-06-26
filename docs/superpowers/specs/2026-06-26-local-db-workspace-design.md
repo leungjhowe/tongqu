@@ -90,6 +90,11 @@ export async function runMigrations() {
 - 迁移在应用启动时自动跑（`apps/desktop/src/main.tsx` 加 await runMigrations()）
 - drizzle-kit 配置在 `apps/desktop/drizzle.config.ts`，输出到 `apps/desktop/drizzle/`
 
+- DB 文件 `apps/desktop/.data/app.db`，gitignored
+- 迁移文件夹 `apps/desktop/drizzle/`，生成 `0000_*.sql` 之类
+- 迁移在应用启动时自动跑（`apps/desktop/src/main.tsx` 加 await runMigrations()）
+- drizzle-kit 配置在 `apps/desktop/drizzle.config.ts`，输出到 `apps/desktop/drizzle/`
+
 ## 5. Auth 改造
 
 ### seed（启动时一次性）
@@ -204,8 +209,8 @@ interface AuthState {
 
 `apps/desktop/src/router/index.tsx`：
 - `/app/workspace` → `<WorkspacePage />`（替换之前的 PlaceholderPage）
-- `/app/workspace/new` → 仍占位（路由上保留，但实际点击"新建项目"按钮弹 modal 不走路由）
-- `/app/workspace/:id` → 仍占位
+- `/app/workspace/new` → 删除此路由（不再需要，新建项目统一走 modal）
+- `/app/workspace/:id` → 仍占位（本轮不实现详情页）
 
 ## 8. DashboardHome 改造
 
