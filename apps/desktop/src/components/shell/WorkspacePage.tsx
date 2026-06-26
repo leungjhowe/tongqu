@@ -7,7 +7,7 @@ import {
   type Project,
 } from "@tps/data-core";
 import { useAuthStore } from "@/stores/authStore";
-import { Archive, Pencil } from "lucide-react";
+import { Archive, Pencil, FolderOpen } from "lucide-react";
 import NewProjectModal from "./NewProjectModal";
 
 function relativeTime(iso: Date | number | string | null): string {
@@ -53,8 +53,8 @@ export default function WorkspacePage() {
     await reload();
   };
 
-  const handleRename = async (id: string) => {
-    const trimmed = editingName.trim();
+  const handleRenameConfirm = async (id: string, name: string) => {
+    const trimmed = name.trim();
     if (!trimmed) return;
     await renameProject(id, trimmed);
     setEditingId(null);
@@ -65,7 +65,6 @@ export default function WorkspacePage() {
   const handleCreated = async (project: Project) => {
     setModalOpen(false);
     await reload();
-    // 占位路由
     window.location.href = `/app/workspace/${project.id}`;
   };
 
@@ -85,20 +84,28 @@ export default function WorkspacePage() {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="搜索项目..."
           aria-label="搜索项目"
-          className="flex-1 max-w-md h-10 px-4 rounded-full bg-secondary border border-border text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary"
+          className="flex-1 max-w-md h-10 px-4 rounded-lg bg-secondary border border-border text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
         />
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-1.5 h-10 px-4 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+          className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
         >
           + 新建项目
         </button>
       </div>
 
-      {/* 列表 */}
+      {/* 宫格 */}
       {loading ? (
-        <div className="text-sm text-muted-foreground py-8 text-center">加载中...</div>
+        <div className="flex items-center justify-center gap-3 flex-wrap py-8">
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="w-[200px] h-[150px] rounded-xl bg-card/50 border border-border/60 animate-pulse"
+              style={{ animationDelay: `${i * 100}ms` }}
+            />
+          ))}
+        </div>
       ) : filtered.length === 0 ? (
         <div className="text-sm text-muted-foreground py-8 text-center">
           暂无项目，去
@@ -107,68 +114,115 @@ export default function WorkspacePage() {
           </button>
         </div>
       ) : (
-        <ul className="flex flex-col gap-2">
-          {filtered.map((p) => {
-            const bg = `hsl(${p.thumbnailHue} 70% 35%)`;
-            const isEditing = editingId === p.id;
-            return (
-              <li
-                key={p.id}
-                className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:border-primary/40 transition-colors"
-              >
-                <span
-                  className="w-10 h-10 rounded-md flex-shrink-0"
-                  style={{ background: bg }}
-                  aria-hidden
-                />
-                {isEditing ? (
-                  <input
-                    autoFocus
-                    value={editingName}
-                    onChange={(e) => setEditingName(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") void handleRename(p.id);
-                      else if (e.key === "Escape") setEditingId(null);
-                    }}
-                    onBlur={() => void handleRename(p.id)}
-                    aria-label="项目名称"
-                    className="flex-1 h-8 px-2 rounded-md border border-primary bg-background text-sm outline-none"
-                  />
-                ) : (
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm text-foreground truncate">{p.name}</div>
-                    <div className="text-[11px] text-muted-foreground">
-                      最后打开 {relativeTime(p.openedAt)}
-                    </div>
-                  </div>
-                )}
-                <div className="flex items-center gap-1">
+        <>
+          <style>{`
+            @keyframes card-enter {
+              from { opacity: 0; transform: translateY(16px) scale(0.96); }
+              to   { opacity: 1; transform: translateY(0) scale(1); }
+            }
+          `}</style>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
+            {filtered.map((p, i) => {
+              const bg = `hsl(${p.thumbnailHue} 70% 35%)`;
+              const isEditing = editingId === p.id;
+
+              return (
+                <div
+                  key={p.id}
+                  className="group relative flex flex-col w-full aspect-[4/3] rounded-xl overflow-hidden border border-border bg-card transition-all duration-200 hover:border-primary/50 hover:shadow-[0_0_16px_hsl(var(--capsule-glow))] hover:-translate-y-0.5 cursor-default"
+                  style={{
+                    animation: `card-enter 0.35s ease-out both`,
+                    animationDelay: `${i * 45}ms`,
+                  }}
+                >
+                  {/* 顶部色块 */}
                   <button
                     type="button"
                     onClick={() => {
-                      setEditingId(p.id);
-                      setEditingName(p.name);
+                      if (!isEditing) {
+                        setEditingId(p.id);
+                        setEditingName(p.name);
+                      }
                     }}
-                    title="重命名"
-                    aria-label="重命名"
-                    className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+                    className="relative flex-1 flex items-center justify-center group-hover:brightness-110 transition-[filter] duration-300"
+                    style={{ background: bg }}
+                    aria-label={`打开 ${p.name}`}
                   >
-                    <Pencil className="w-3.5 h-3.5" aria-hidden />
+                    <FolderOpen className="w-8 h-8 text-white/80 group-hover:scale-110 transition-transform duration-300" />
+
+                    {/* Hover 时浮现的操作 */}
+                    <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingId(p.id);
+                          setEditingName(p.name);
+                        }}
+                        title="重命名"
+                        aria-label="重命名"
+                        className="w-7 h-7 rounded-md flex items-center justify-center bg-black/40 text-white/90 hover:bg-black/60 transition-colors backdrop-blur-sm"
+                      >
+                        <Pencil className="w-3.5 h-3.5" aria-hidden />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          void handleArchive(p.id);
+                        }}
+                        title="归档"
+                        aria-label="归档"
+                        className="w-7 h-7 rounded-md flex items-center justify-center bg-black/40 text-white/90 hover:bg-destructive/70 transition-colors backdrop-blur-sm"
+                      >
+                        <Archive className="w-3.5 h-3.5" aria-hidden />
+                      </button>
+                    </div>
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => void handleArchive(p.id)}
-                    title="归档"
-                    aria-label="归档"
-                    className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
-                  >
-                    <Archive className="w-3.5 h-3.5" aria-hidden />
-                  </button>
+
+                  {/* 底部信息区 */}
+                  <div className="flex flex-col gap-0.5 px-3 py-2 min-h-[60px]">
+                    {isEditing ? (
+                      <input
+                        autoFocus
+                        value={editingName}
+                        onChange={(e) => setEditingName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            void handleRenameConfirm(p.id, editingName);
+                          } else if (e.key === "Escape") {
+                            setEditingId(null);
+                            setEditingName("");
+                          }
+                        }}
+                        onBlur={() => void handleRenameConfirm(p.id, editingName)}
+                        aria-label="项目名称"
+                        className="w-full h-7 px-2 rounded-md border border-primary bg-background text-sm text-foreground outline-none"
+                      />
+                    ) : (
+                      <>
+                        <span
+                          className="text-sm font-medium text-foreground truncate cursor-pointer hover:text-primary transition-colors"
+                          onClick={() => {
+                            setEditingId(p.id);
+                            setEditingName(p.name);
+                          }}
+                          title="点击重命名"
+                        >
+                          {p.name}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {relativeTime(p.openedAt)}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </li>
-            );
-          })}
-        </ul>
+              );
+            })}
+          </div>
+        </>
       )}
 
       <NewProjectModal open={modalOpen} onClose={() => setModalOpen(false)} onCreated={handleCreated} />
