@@ -18,6 +18,10 @@
 - `useAuthStore` 持久化到 localStorage（已有逻辑保留）：启动时如 persisted user 有效，直接跳过 login 进 dashboard。
 - 提交信息中文 + emoji 前缀（与既有 `045ecf4` / `ed713c6` 一致）。
 - 路径一律相对项目根 `/Users/jhowe/Documents/code/company/dongguan-trans/tps/`。
+- **架构偏差（Task 2 fix）**：原计划用 libsql `file:` URL。浏览器不支持 `file:` 协议，改为 `http://localhost:8080` + 本地 `sqld` 进程。
+  - `drizzle-orm/libsql/migrator` 依赖 `node:fs`，浏览器不可用。`runMigrations()` 改为用 Vite `import.meta.glob` 预加载 SQL 文件 + `client.execute()` 执行业务。
+  - 开发流程：`sqld` 先启动（`node scripts/start-libsql-server.mjs`），然后 `pnpm dev` 启动 Vite。
+  - 生产态（Tauri build）：`sqld` 由 Tauri 伴生进程管理。本期仅实现 dev 模式。
 - 7 个 task，每个单独 commit。Task 完成后跑 `pnpm --filter @tps/desktop exec tsc -b` 确认无 TS 错误；改动 UI 的 task 还要跑 `pnpm --filter @tps/desktop e2e` 确认现有 6 个 E2E 不破。
 
 ---
