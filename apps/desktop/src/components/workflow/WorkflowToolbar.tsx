@@ -87,9 +87,10 @@ function NodeTypeList({
 
 export default function WorkflowToolbar({ onAddNode }: WorkflowToolbarProps) {
   return (
-    <aside className="flex flex-col items-center gap-2.5 pt-4 pb-3 border-r border-border bg-card h-full">
+    /* 胶囊工具栏 — 浮在画布上方，圆角高矩形 */
+    <div className="flex flex-col items-center gap-2.5 py-4 px-2 rounded-2xl bg-card/80 backdrop-blur-md border border-border shadow-elevation-2">
       {/* 新增节点 — hover 显示节点类型列表 */}
-      <ToolItem icon={Plus} label="新增节点">
+      <ToolItem key="add" icon={Plus} label="新增节点">
         <NodeTypeList
           types={NODE_TYPES}
           onSelect={(type) => {
@@ -102,10 +103,10 @@ export default function WorkflowToolbar({ onAddNode }: WorkflowToolbarProps) {
       <div className="w-5 h-px bg-border my-0.5" />
 
       {/* 其他菜单项（占位 — 先只加菜单壳） */}
-      <ToolItem icon={Search} label="节点搜索" />
-      <ToolItem icon={Archive} label="资产" />
-      <ToolItem icon={Layout} label="模板" />
-      <ToolItem icon={History} label="历史" />
-    </aside>
+      <ToolItem key="search" icon={Search} label="节点搜索" />
+      <ToolItem key="assets" icon={Archive} label="资产" />
+      <ToolItem key="templates" icon={Layout} label="模板" />
+      <ToolItem key="history" icon={History} label="历史" />
+    </div>
   );
 }

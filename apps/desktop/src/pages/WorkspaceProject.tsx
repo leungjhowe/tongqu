@@ -146,30 +146,35 @@ export default function WorkspaceProject() {
 
   return (
     <main className="flex-1 flex flex-col min-h-0 bg-background">
-      <SplitLayout
-        left={<WorkflowToolbar onAddNode={handleAddNode} />}
-        leftWidth={56}
-        center={
-          <WorkflowCanvas
-            graph={graph}
-            readOnly
-            onNodeClick={(nodeId) => setSelectedNodeId(nodeId)}
-          />
-        }
-        right={
-          selectedNodeId ? (
-            <NodeDetailPanel
-              node={selectedNode}
-              messages={currentMessages}
-              draft={currentDraft}
-              onDraftChange={handleNodeDraftChange}
-              onSend={handleNodeChat}
-              onClose={handleCloseDetail}
+      <div className="relative flex-1 flex min-h-0">
+        {/* 漂浮胶囊工具栏 */}
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 z-floating">
+          <WorkflowToolbar onAddNode={handleAddNode} />
+        </div>
+
+        <SplitLayout
+          center={
+            <WorkflowCanvas
+              graph={graph}
+              readOnly
+              onNodeClick={(nodeId) => setSelectedNodeId(nodeId)}
             />
-          ) : undefined
-        }
-        rightWidth={360}
-      />
+          }
+          right={
+            selectedNodeId ? (
+              <NodeDetailPanel
+                node={selectedNode}
+                messages={currentMessages}
+                draft={currentDraft}
+                onDraftChange={handleNodeDraftChange}
+                onSend={handleNodeChat}
+                onClose={handleCloseDetail}
+              />
+            ) : undefined
+          }
+          rightWidth={360}
+        />
+      </div>
     </main>
   );
 }
