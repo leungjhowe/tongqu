@@ -1,9 +1,17 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import {
+  findUserByUsername,
+  comparePassword,
+  createGuestUser,
+  type User as DbUser,
+} from "@tps/data-core";
 
+/** UI 层用的精简 User（去掉 passwordHash 等）。 */
 export interface User {
   id: string;
   username: string;
+  isGuest: boolean;
 }
 
 export interface AuthState {
@@ -11,20 +19,16 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  login: (username: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<boolean>;
+  loginAsGuest: (username: string) => Promise<boolean>;
   logout: () => void;
   clearError: () => void;
 }
 
-/**
- * Auth store. Persists `user` + `isAuthenticated` to localStorage so a
- * page refresh keeps the session. `isLoading` and `error` are intentionally
- * NOT persisted — they represent transient request state.
- *
- * NOTE: this is a mock auth flow per the spec — any non-empty
- * username/password succeeds. A real implementation would call the backend
- * here and surface server-side errors.
- */
+function toUIUser(u: DbUser): User {
+  return { id: u.id, username: u.username, isGuest: u.isGuest };
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -34,22 +38,72 @@ export const useAuthStore = create<AuthState>()(
       error: null,
 
       login: async (username, password) => {
+        if (!username.trim() || !password.trim()) {
+          set({ error: "用户名和密码不能为空" });
+          return false;
+        }
         set({ isLoading: true, error: null });
 
-        // Simulate a network round-trip so the UI can show a real loading state.
-        await new Promise((resolve) => setTimeout(resolve, 600));
-
-        if (!username.trim() || !password.trim()) {
-          set({ error: "用户名和密码不能为空", isLoading: false });
-          return;
+        const dbUser = await findUserByUsername(username.trim());
+        if (!dbUser || dbUser.isGuest) {
+          set({ error: "用户名或密码错误", isLoading: false });
+          return false;
         }
-
+        const ok = await comparePassword(password, dbUser.passwordHash);
+        if (!ok) {
+          set({ error: "用户名或密码错误", isLoading: false });
+          return false;
+        }
         set({
-          user: { id: "1", username },
+          user: toUIUser(dbUser),
           isAuthenticated: true,
           isLoading: false,
           error: null,
         });
+        return true;
+      },
+
+      loginAsGuest: async (username) => {
+        const trimmed = username.trim();
+        if (!trimmed) {
+          set({ error: "请输入游客用户名" });
+          return false;
+        }
+        set({ isLoading: true, error: null });
+
+        const existing = await findUserByUsername(trimmed);
+        if (existing) {
+          if (!existing.isGuest) {
+            // 已注册账号拒绝游客模式
+            set({
+              error: "该用户名已注册，请用密码登录",
+              isLoading: false,
+            });
+            return false;
+          }
+          // 已有同名游客 → 直接登录
+          set({
+            user: toUIUser(existing),
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
+          return true;
+        }
+
+        try {
+          const created = await createGuestUser(trimmed);
+          set({
+            user: toUIUser(created),
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
+          return true;
+        } catch {
+          set({ error: "创建游客失败，请重试", isLoading: false });
+          return false;
+        }
       },
 
       logout: () => {
