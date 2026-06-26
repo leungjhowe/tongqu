@@ -88,6 +88,17 @@ export default defineConfig({
       border: 'hsl(var(--border))',
       background: 'hsl(var(--background))',
     },
+    // Spec v2 §7.1 — z-index utilities (named layers).
+    zIndex: {
+      base: 'var(--z-base)',
+      canvas: 'var(--z-canvas)',
+      sticky: 'var(--z-sticky)',
+      floating: 'var(--z-floating)',
+      overlay: 'var(--z-overlay)',
+      modal: 'var(--z-modal)',
+      toast: 'var(--z-toast)',
+      tooltip: 'var(--z-tooltip)',
+    },
     borderRadius: {
       none: '0',
       xs: '2px',
@@ -185,5 +196,7 @@ export default defineConfig({
     // Spec v2 — SVG fill / stroke utilities (commit 2).
     'fill-border', 'fill-primary', 'fill-background',
     'stroke-border', 'stroke-background',
+    // Spec v2 — z-index utilities (commit 12, moved up so commit 10 can use).
+    'z-base', 'z-canvas', 'z-sticky', 'z-floating', 'z-overlay', 'z-modal', 'z-toast', 'z-tooltip',
   ],
 });

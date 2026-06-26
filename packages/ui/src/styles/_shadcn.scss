@@ -42,4 +42,14 @@
   --warning-fg: 222 47% 6%;
   --info: 199 89% 60%;
   --info-fg: 222 47% 6%;
+
+  /* Spec v1 §7.1 — z-index scale (named layers, gaps for inserts). */
+  --z-base: 0;
+  --z-canvas: 1;
+  --z-sticky: 10;
+  --z-floating: 20;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-tooltip: 70;
 }
