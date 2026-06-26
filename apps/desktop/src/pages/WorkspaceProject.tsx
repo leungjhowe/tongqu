@@ -3,58 +3,21 @@ import { useParams } from "react-router-dom";
 import { SplitLayout } from "@tps/ui";
 import { WorkflowCanvas } from "@tps/workflow-ui";
 import { getProjectById, touchProject, type Project } from "@tps/data-core";
-import type { WorkflowGraph } from "@tps/workflow-core";
+import type { WorkflowGraph, WorkflowNode } from "@tps/workflow-core";
 import NodeDetailPanel, { type ChatMessage } from "@/components/workflow/NodeDetailPanel";
+import WorkflowToolbar from "@/components/workflow/WorkflowToolbar";
 
-/**
- * 示例工作流图 — 交通数据分析 pipeline。
- * 无 DB 持久化，展示骨架布局用。
- */
-const SAMPLE_GRAPH: WorkflowGraph = {
-  id: "sample",
-  name: "交通数据分析",
-  nodes: [
-    {
-      id: "n1",
-      type: "data",
-      title: "导入数据",
-      params: { source: "CSV" },
-      position: { x: 50, y: 200 },
-    },
-    {
-      id: "n2",
-      type: "transform",
-      title: "数据清洗",
-      params: {},
-      position: { x: 350, y: 200 },
-    },
-    {
-      id: "n3",
-      type: "transform",
-      title: "路线分析",
-      params: { algorithm: "A*" },
-      position: { x: 350, y: 400 },
-    },
-    {
-      id: "n4",
-      type: "output",
-      title: "导出结果",
-      params: { format: "GeoJSON" },
-      position: { x: 650, y: 300 },
-    },
-  ],
-  edges: [
-    { id: "e1", source: "n1", target: "n2" },
-    { id: "e2", source: "n2", target: "n3" },
-    { id: "e2b", source: "n2", target: "n4" },
-    { id: "e3", source: "n3", target: "n4" },
-  ],
-};
+/** 空工作流图（初始状态）。 */
+const EMPTY_GRAPH: WorkflowGraph = { id: "graph", name: "", nodes: [], edges: [] };
+
+let nodeCounter = 0;
+const nextNodeId = () => `node-${Date.now()}-${++nodeCounter}`;
 
 export default function WorkspaceProject() {
   const { id } = useParams<{ id: string }>();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
+  const [graph, setGraph] = useState<WorkflowGraph>(EMPTY_GRAPH);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [nodeMessages, setNodeMessages] = useState<Map<string, ChatMessage[]>>(
     () => new Map()
@@ -65,7 +28,7 @@ export default function WorkspaceProject() {
 
   // 当前选中节点对象
   const selectedNode =
-    SAMPLE_GRAPH.nodes.find((n) => n.id === selectedNodeId) ?? null;
+    graph.nodes.find((n) => n.id === selectedNodeId) ?? null;
   const currentMessages = selectedNodeId
     ? nodeMessages.get(selectedNodeId) ?? []
     : [];
@@ -131,6 +94,22 @@ export default function WorkspaceProject() {
     setSelectedNodeId(null);
   }, []);
 
+  /** 从左侧工具栏新增节点 */
+  const handleAddNode = useCallback((_type: WorkflowNode["type"]) => {
+    const nodeId = nextNodeId();
+    const newNode: WorkflowNode = {
+      id: nodeId,
+      type: _type,
+      title: "文本节点",
+      params: { content: "" },
+      position: { x: 100 + (nodeCounter % 5) * 200, y: 150 + Math.floor(nodeCounter / 5) * 120 },
+    };
+    setGraph((prev) => ({
+      ...prev,
+      nodes: [...prev.nodes, newNode],
+    }));
+  }, []);
+
   useEffect(() => {
     if (!id) return;
     let cancelled = false;
@@ -168,9 +147,11 @@ export default function WorkspaceProject() {
   return (
     <main className="flex-1 flex flex-col min-h-0 bg-background">
       <SplitLayout
+        left={<WorkflowToolbar onAddNode={handleAddNode} />}
+        leftWidth={56}
         center={
           <WorkflowCanvas
-            graph={SAMPLE_GRAPH}
+            graph={graph}
             readOnly
             onNodeClick={(nodeId) => setSelectedNodeId(nodeId)}
           />
