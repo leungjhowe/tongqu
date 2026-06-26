@@ -20,15 +20,15 @@ export const MapPanel = React.forwardRef<HTMLDivElement, MapPanelProps>(
     >
       {title && (
         <div className="z-10 flex items-center justify-between border-b border-border bg-card/80 px-4 py-2 backdrop-blur">
-          <div className="text-sm font-medium">{title}</div>
+          <div className="text-h3">{title}</div>
           {overlay}
         </div>
       )}
       <div className="flex flex-1 items-center justify-center">
         {children ?? (
           <div className="text-center">
-            <div className="text-2xl font-semibold text-muted-foreground">Map / GIS</div>
-            <div className="mt-1 text-xs text-muted-foreground">OpenLayers integration pending</div>
+            <div className="text-display-md text-muted-foreground">Map / GIS</div>
+            <div className="mt-1 text-caption text-muted-foreground">OpenLayers integration pending</div>
           </div>
         )}
       </div>

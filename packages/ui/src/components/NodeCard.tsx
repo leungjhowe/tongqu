@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
 const nodeCardVariants = cva(
-  'relative flex flex-col gap-2 rounded border bg-card text-card-foreground shadow-sm transition-all min-w-[140px]',
+  'relative flex flex-col gap-2 rounded border bg-card text-card-foreground shadow-elevation-1 transition-all duration-base min-w-[140px]',
   {
     variants: {
       type: {
@@ -12,7 +12,7 @@ const nodeCardVariants = cva(
         output: 'border-l-4 border-l-destructive',
       },
       selected: {
-        true: 'shadow-[0_0_0_1px_hsl(var(--primary)),0_0_12px_hsl(var(--primary)/0.35)] border-primary',
+        true: 'shadow-glow-primary border-primary',
         false: 'border-border',
       },
     },
@@ -54,11 +54,11 @@ export const NodeCard = React.forwardRef<HTMLDivElement, NodeCardProps>(
       >
         {inputPorts}
         {outputPorts}
-        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="text-caption font-semibold uppercase tracking-wide text-muted-foreground">
           {type}
         </div>
-        <div className="text-sm font-medium text-foreground">{title}</div>
-        {subtitle && <div className="text-xs text-muted-foreground">{subtitle}</div>}
+        <div className="text-h3 text-foreground">{title}</div>
+        {subtitle && <div className="text-caption text-muted-foreground">{subtitle}</div>}
       </div>
     );
   }
