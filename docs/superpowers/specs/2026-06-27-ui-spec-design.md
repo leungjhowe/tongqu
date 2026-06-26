@@ -324,7 +324,7 @@ language: zh-CN
 | `<Button variant="destructive">` | `bg-destructive text-destructive-foreground` | `--destructive` + `--destructive-fg` |
 | `<Button size="sm">` | `h-8 px-3 text-xs` | `--space-3` × `--space-2` × `--text-caption` |
 | `<Button size="default">` | `h-9 px-4 py-2` | `--space-4` × `--space-2` |
-| `<Button size="lg">` | `h-11 rounded px-8 text-base` | `--space-8` × `--text-body` |
+| `<Button size="lg">` | `h-11 rounded px-8 text-base` | `--space-6` × `--text-body-lg` |
 | `<Button size="icon">` | `h-9 w-9` | 正方形按钮 |
 | `<Panel>` | `rounded-lg border border-border bg-card` | `--radius-lg` + `--hairline` + `--surface-1` |
 | `<Card>` | `bg-card text-card-foreground` | `--surface-1` + `--ink` |
