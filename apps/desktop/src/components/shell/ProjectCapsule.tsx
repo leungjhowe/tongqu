@@ -27,16 +27,18 @@ export default function ProjectCapsule({ project, onOpen }: ProjectCapsuleProps)
       type="button"
       onClick={() => onOpen(project.id)}
       title={project.name}
-      className="group flex flex-col w-full h-[150px] rounded-lg overflow-hidden border border-capsule-border bg-capsule-bg/0.7 hover:border-capsule-border-active hover:scale-[1.02] transition-[transform,border-color] duration-base cursor-pointer text-left"
+      className="group grid grid-rows-[1fr_auto] w-full h-[150px] rounded-lg overflow-hidden border border-capsule-border bg-capsule-bg/0.7 hover:border-capsule-border-active hover:scale-[1.02] transition-[transform,border-color] duration-base cursor-pointer text-left"
     >
+      {/* row 1 (1fr) — 缩略图区域，grid stretch 确保填满 */}
       <span
-        className="relative flex-1 min-h-0 flex items-center justify-center group-hover:brightness-110 transition-[filter] duration-base"
+        className="relative flex items-center justify-center overflow-hidden group-hover:brightness-110 transition-[filter] duration-base"
         style={{ background: bg }}
         aria-hidden
       >
         <FolderOpen className="w-8 h-8 text-white/85" />
       </span>
-      <span className="shrink-0 flex flex-col gap-0.5 px-3 py-2 min-h-[60px]">
+      {/* row 2 (auto) — 文字信息，内容高度 */}
+      <span className="flex flex-col gap-0.5 px-3 py-2">
         <span className="text-body font-medium text-foreground truncate">
           {project.name}
         </span>
