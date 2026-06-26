@@ -56,7 +56,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <span
             id={describedBy}
             className={cn(
-              'text-xs',
+              'text-caption',
               error ? 'text-destructive' : 'text-muted-foreground/70',
             )}
           >
