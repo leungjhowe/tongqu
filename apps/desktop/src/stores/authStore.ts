@@ -44,23 +44,35 @@ export const useAuthStore = create<AuthState>()(
         }
         set({ isLoading: true, error: null });
 
-        const dbUser = await findUserByUsername(username.trim());
-        if (!dbUser || dbUser.isGuest) {
-          set({ error: "用户名或密码错误", isLoading: false });
+        try {
+          const dbUser = await findUserByUsername(username.trim());
+          if (!dbUser || dbUser.isGuest) {
+            set({ error: "用户名或密码错误", isLoading: false });
+            return false;
+          }
+          const ok = await comparePassword(password, dbUser.passwordHash);
+          if (!ok) {
+            set({ error: "用户名或密码错误", isLoading: false });
+            return false;
+          }
+          set({
+            user: toUIUser(dbUser),
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
+          return true;
+        } catch (e) {
+          // DB 调用抛错（sqld 未启 / schema 缺失 / 网络）时必须复位
+          // isLoading 并把错误暴露给 UI，否则按钮会卡在 "进入中"。
+          // eslint-disable-next-line no-console
+          console.error("[auth] login failed:", e);
+          set({
+            error: "登录失败：无法访问本地数据库，请确认 sqld 已启动",
+            isLoading: false,
+          });
           return false;
         }
-        const ok = await comparePassword(password, dbUser.passwordHash);
-        if (!ok) {
-          set({ error: "用户名或密码错误", isLoading: false });
-          return false;
-        }
-        set({
-          user: toUIUser(dbUser),
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
-        });
-        return true;
       },
 
       loginAsGuest: async (username) => {
@@ -71,27 +83,27 @@ export const useAuthStore = create<AuthState>()(
         }
         set({ isLoading: true, error: null });
 
-        const existing = await findUserByUsername(trimmed);
-        if (existing) {
-          if (!existing.isGuest) {
-            // 已注册账号拒绝游客模式
-            set({
-              error: "该用户名已注册，请用密码登录",
-              isLoading: false,
-            });
-            return false;
-          }
-          // 已有同名游客 → 直接登录
-          set({
-            user: toUIUser(existing),
-            isAuthenticated: true,
-            isLoading: false,
-            error: null,
-          });
-          return true;
-        }
-
         try {
+          const existing = await findUserByUsername(trimmed);
+          if (existing) {
+            if (!existing.isGuest) {
+              // 已注册账号拒绝游客模式
+              set({
+                error: "该用户名已注册，请用密码登录",
+                isLoading: false,
+              });
+              return false;
+            }
+            // 已有同名游客 → 直接登录
+            set({
+              user: toUIUser(existing),
+              isAuthenticated: true,
+              isLoading: false,
+              error: null,
+            });
+            return true;
+          }
+
           const created = await createGuestUser(trimmed);
           set({
             user: toUIUser(created),
@@ -100,8 +112,13 @@ export const useAuthStore = create<AuthState>()(
             error: null,
           });
           return true;
-        } catch {
-          set({ error: "创建游客失败，请重试", isLoading: false });
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error("[auth] loginAsGuest failed:", e);
+          set({
+            error: "登录失败：无法访问本地数据库，请确认 sqld 已启动",
+            isLoading: false,
+          });
           return false;
         }
       },
