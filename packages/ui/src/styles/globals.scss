@@ -75,3 +75,18 @@ a {
 /* show a primary border + animated underline, the submit button shows */
 /* a primary halo ring.  Keep this file lean so component authors own  */
 /* the focus language per surface.                                    */
+
+/* Spec v1 §6.3 — collapse every CSS animation/transition for users who  */
+/* request reduced motion.  GSAP timelines already honor this via       */
+/* gsap.matchMedia at the consumer level (see Login.tsx); this block is */
+/* the CSS-side safety net for any transition-* or animate-* utility.  */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
