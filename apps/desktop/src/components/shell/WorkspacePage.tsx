@@ -129,7 +129,7 @@ export default function WorkspacePage() {
               return (
                 <div
                   key={p.id}
-                  className="group relative flex flex-col w-full aspect-[4/3] rounded-xl overflow-hidden border border-border bg-card transition-all duration-200 hover:border-primary/50 hover:shadow-[0_0_16px_hsl(var(--capsule-glow))] hover:-translate-y-0.5 cursor-default"
+                  className="group relative flex flex-col w-full aspect-[4/3] rounded-xl overflow-hidden border border-border bg-card transition-all duration-base hover:border-primary/50 hover:shadow-glow-primary hover:-translate-y-0.5 cursor-default"
                   style={{
                     animation: `card-enter 0.35s ease-out both`,
                     animationDelay: `${i * 45}ms`,
@@ -144,11 +144,11 @@ export default function WorkspacePage() {
                         setEditingName(p.name);
                       }
                     }}
-                    className="relative flex-1 flex items-center justify-center group-hover:brightness-110 transition-[filter] duration-300"
+                    className="relative flex-1 flex items-center justify-center group-hover:brightness-110 transition-[filter] duration-slow"
                     style={{ background: bg }}
                     aria-label={`打开 ${p.name}`}
                   >
-                    <FolderOpen className="w-8 h-8 text-white/80 group-hover:scale-110 transition-transform duration-300" />
+                    <FolderOpen className="w-8 h-8 text-white/80 group-hover:scale-110 transition-transform duration-slow" />
 
                     {/* Hover 时浮现的操作 */}
                     <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -203,7 +203,7 @@ export default function WorkspacePage() {
                     ) : (
                       <>
                         <span
-                          className="text-sm font-medium text-foreground truncate cursor-pointer hover:text-primary transition-colors"
+                          className="text-body font-medium text-foreground truncate cursor-pointer hover:text-primary transition-colors"
                           onClick={() => {
                             setEditingId(p.id);
                             setEditingName(p.name);
@@ -212,7 +212,7 @@ export default function WorkspacePage() {
                         >
                           {p.name}
                         </span>
-                        <span className="text-[11px] text-muted-foreground">
+                        <span className="text-micro text-muted-foreground">
                           {relativeTime(p.openedAt)}
                         </span>
                       </>
