@@ -44,7 +44,7 @@ export const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
       >
         {(title || collapsible || actions) && (
           <div className="flex items-center justify-between border-b border-border px-4 py-2">
-            <div className="text-sm font-medium text-foreground">{title}</div>
+            <div className="text-h3 text-foreground">{title}</div>
             <div className="flex items-center gap-2">
               {actions}
               {collapsible && (

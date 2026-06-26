@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
 const cardVariants = cva(
-  'rounded-lg border border-border bg-card text-card-foreground transition-shadow',
+  'rounded-lg border border-border bg-card text-card-foreground transition-shadow duration-base',
   {
     variants: {
       padding: {
@@ -13,8 +13,8 @@ const cardVariants = cva(
         lg: 'p-6',
       },
       glow: {
-        true: 'shadow-[0_0_0_1px_hsl(var(--border)),0_0_12px_hsl(var(--primary)/0.25)]',
-        false: 'shadow-sm',
+        true: 'shadow-glow-primary',
+        false: 'shadow-elevation-1',
       },
       interactive: {
         true: 'cursor-pointer hover:border-ring',

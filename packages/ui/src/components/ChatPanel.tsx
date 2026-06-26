@@ -64,8 +64,8 @@ export const ChatPanel = React.forwardRef<HTMLDivElement, ChatPanelProps>(
       >
         <header className="flex items-center justify-between border-b border-border px-4 py-2">
           <div>
-            <div className="text-sm font-semibold text-foreground">{title}</div>
-            <div className="text-xs text-muted-foreground">{subtitle}</div>
+            <div className="text-h3 text-foreground">{title}</div>
+            <div className="text-caption text-muted-foreground">{subtitle}</div>
           </div>
           {onCollapsedChange && (
             <Button
@@ -103,7 +103,7 @@ export const ChatPanel = React.forwardRef<HTMLDivElement, ChatPanelProps>(
             >
               <div
                 className={cn(
-                  'rounded px-3 py-2 text-sm whitespace-pre-wrap',
+                  'rounded-md px-3 py-2 text-body whitespace-pre-wrap',
                   m.role === 'user'
                     ? 'bg-secondary text-secondary-foreground'
                     : 'bg-transparent text-foreground'
