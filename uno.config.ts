@@ -86,19 +86,21 @@ export default defineConfig({
       mono: ['"JetBrains Mono"', '"Fira Code"', 'Menlo', 'Consolas', 'monospace'],
     },
     // Spec v1 — type scale (size / lineHeight / fontWeight / letterSpacing).
+    // NOTE: keys MUST be kebab-case CSS properties; UnoCSS does NOT auto-convert
+    // camelCase keys for fontSize tuples (browser would ignore `lineHeight` etc.).
     fontSize: {
-      'display-lg': ['40px', { lineHeight: '1.10', fontWeight: '600', letterSpacing: '-0.025em' }],
-      'display-md': ['32px', { lineHeight: '1.15', fontWeight: '600', letterSpacing: '-0.02em' }],
-      'h1': ['24px', { lineHeight: '1.25', fontWeight: '600', letterSpacing: '-0.01em' }],
-      'h2': ['20px', { lineHeight: '1.30', fontWeight: '600', letterSpacing: '-0.01em' }],
-      'h3': ['16px', { lineHeight: '1.40', fontWeight: '600', letterSpacing: '-0.005em' }],
-      'body-lg': ['16px', { lineHeight: '1.55', fontWeight: '400' }],
-      'body': ['14px', { lineHeight: '1.55', fontWeight: '400' }],
-      'body-sm': ['13px', { lineHeight: '1.55', fontWeight: '400' }],
-      'caption': ['12px', { lineHeight: '1.40', fontWeight: '500', letterSpacing: '0.005em' }],
-      'micro': ['11px', { lineHeight: '1.30', fontWeight: '500', letterSpacing: '0.01em' }],
-      'button': ['14px', { lineHeight: '1.00', fontWeight: '500' }],
-      'link': ['14px', { lineHeight: '1.40', fontWeight: '500' }],
+      'display-lg': ['40px', { 'line-height': '1.10', 'font-weight': '600', 'letter-spacing': '-0.025em' }],
+      'display-md': ['32px', { 'line-height': '1.15', 'font-weight': '600', 'letter-spacing': '-0.02em' }],
+      'h1': ['24px', { 'line-height': '1.25', 'font-weight': '600', 'letter-spacing': '-0.01em' }],
+      'h2': ['20px', { 'line-height': '1.30', 'font-weight': '600', 'letter-spacing': '-0.01em' }],
+      'h3': ['16px', { 'line-height': '1.40', 'font-weight': '600', 'letter-spacing': '-0.005em' }],
+      'body-lg': ['16px', { 'line-height': '1.55', 'font-weight': '400' }],
+      'body': ['14px', { 'line-height': '1.55', 'font-weight': '400' }],
+      'body-sm': ['13px', { 'line-height': '1.55', 'font-weight': '400' }],
+      'caption': ['12px', { 'line-height': '1.40', 'font-weight': '500', 'letter-spacing': '0.005em' }],
+      'micro': ['11px', { 'line-height': '1.30', 'font-weight': '500', 'letter-spacing': '0.01em' }],
+      'button': ['14px', { 'line-height': '1.00', 'font-weight': '500' }],
+      'link': ['14px', { 'line-height': '1.40', 'font-weight': '500' }],
     },
     // Spec v1 — motion duration scale.
     transitionDuration: {
