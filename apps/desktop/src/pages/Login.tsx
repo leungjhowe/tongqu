@@ -356,12 +356,15 @@ function FloatingInput({
 export default function Login() {
   const navigate = useNavigate();
   const login = useAuthStore((s) => s.login);
+  const loginAsGuest = useAuthStore((s) => s.loginAsGuest);
   const error = useAuthStore((s) => s.error);
   const isLoading = useAuthStore((s) => s.isLoading);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
+  const [mode, setMode] = useState<"password" | "guest">("password");
+  const [guestName, setGuestName] = useState("");
 
   /* Live network metrics shown in the branding column.  These tick up   */
   /* on a slow interval so the panel reads as a live system, not a     */
@@ -928,18 +931,33 @@ export default function Login() {
   const onSubmit = async (e?: FormEvent | KeyboardEvent) => {
     e?.preventDefault?.();
     setLocalError(null);
-    if (!username.trim() || !password.trim()) {
-      setLocalError("请填写用户名和密码");
-      // A small shake on the form so the empty-field error feels physical.
-      gsap.fromTo(
-        "[data-anim='form-card']",
-        { x: -6 },
-        { x: 0, duration: 0.5, ease: "elastic.out(1.2, 0.4)" },
-      );
-      return;
+    if (mode === "password") {
+      if (!username.trim() || !password.trim()) {
+        setLocalError("请填写用户名和密码");
+        // A small shake on the form so the empty-field error feels physical.
+        gsap.fromTo(
+          "[data-anim='form-card']",
+          { x: -6 },
+          { x: 0, duration: 0.5, ease: "elastic.out(1.2, 0.4)" },
+        );
+        return;
+      }
+      const ok = await login(username, password);
+      if (ok) navigate("/app/home", { replace: true });
+    } else {
+      if (!guestName.trim()) {
+        setLocalError("请输入游客用户名");
+        // A small shake on the form so the empty-field error feels physical.
+        gsap.fromTo(
+          "[data-anim='form-card']",
+          { x: -6 },
+          { x: 0, duration: 0.5, ease: "elastic.out(1.2, 0.4)" },
+        );
+        return;
+      }
+      const ok = await loginAsGuest(guestName);
+      if (ok) navigate("/app/home", { replace: true });
     }
-    await login(username, password);
-    navigate("/app", { replace: true });
   };
 
   const nodeMap = new Map<string, (typeof NETWORK_NODES)[number]>(
@@ -1381,35 +1399,56 @@ export default function Login() {
 
             {/* Floating-label inputs.  Inline so we can drive the floating */}
             {/* state from controlled component value (no peer selector).    */}
-            <div data-anim="form-child" className="flex flex-col gap-1">
-              <FloatingInput
-                label="用户名"
-                autoComplete="username"
-                autoFocus
-                value={username}
-                onChange={(v) => {
-                  setUsername(v);
-                  if (localError) setLocalError(null);
-                }}
-              />
-            </div>
+            {mode === "password" ? (
+              <>
+                <div data-anim="form-child" className="flex flex-col gap-1">
+                  <FloatingInput
+                    label="用户名"
+                    autoComplete="username"
+                    autoFocus
+                    value={username}
+                    onChange={(v) => {
+                      setUsername(v);
+                      if (localError) setLocalError(null);
+                    }}
+                  />
+                </div>
 
-            <div data-anim="form-child" className="flex flex-col gap-1">
-              <FloatingInput
-                label="密码"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(v) => {
-                  setPassword(v);
-                  if (localError) setLocalError(null);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") onSubmit(e);
-                }}
-                error={displayError}
-              />
-            </div>
+                <div data-anim="form-child" className="flex flex-col gap-1">
+                  <FloatingInput
+                    label="密码"
+                    type="password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(v) => {
+                      setPassword(v);
+                      if (localError) setLocalError(null);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") onSubmit(e);
+                    }}
+                    error={displayError}
+                  />
+                </div>
+              </>
+            ) : (
+              <div data-anim="form-child" className="flex flex-col gap-1">
+                <FloatingInput
+                  label="游客用户名"
+                  autoComplete="off"
+                  autoFocus
+                  value={guestName}
+                  onChange={(v) => {
+                    setGuestName(v);
+                    if (localError) setLocalError(null);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") onSubmit(e);
+                  }}
+                  error={displayError}
+                />
+              </div>
+            )}
 
             {/* Submit button.  Magnetic + elastic press + scan beam during */}
             {/* loading + checkmark on success.                            */}
@@ -1463,11 +1502,20 @@ export default function Login() {
                   </>
                 ) : (
                   <>
-                    <span>进入系统</span>
+                    <span>{mode === "password" ? "进入系统" : "游客进入"}</span>
                     <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover/submit:translate-x-1" />
                   </>
                 )}
               </span>
+            </button>
+
+            {/* Mode toggle link */}
+            <button
+              type="button"
+              onClick={() => setMode((m) => (m === "password" ? "guest" : "password"))}
+              className="mt-3 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {mode === "password" ? "以游客身份进入 →" : "← 用账号密码登录"}
             </button>
 
             {/* Footer trust line */}
