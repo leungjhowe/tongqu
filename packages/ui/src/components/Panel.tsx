@@ -63,7 +63,7 @@ export const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
         )}
         <div
           className={cn(
-            'flex-1 overflow-auto p-4 transition-all',
+            'flex-1 overflow-auto p-4 transition-all duration-base',
             collapsed && 'h-0 overflow-hidden p-0'
           )}
         >
