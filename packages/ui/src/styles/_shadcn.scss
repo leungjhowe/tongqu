@@ -52,4 +52,8 @@
   --z-modal: 50;
   --z-toast: 60;
   --z-tooltip: 70;
+
+  /* Spec v2 — browser chrome (scrollbar) — semantic split from capsule tokens. */
+  --scrollbar-thumb: 217 91% 60% / 0.4;
+  --scrollbar-thumb-hover: 217 91% 60% / 0.7;
 }

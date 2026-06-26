@@ -99,6 +99,15 @@ language: zh-CN
 | `--capsule-glow` | `217 91% 60% / 0.18` | 外发光 |
 | `--capsule-radius` | `9999px` | 胶囊圆角 |
 
+### 1.8 浏览器界面（Scrollbar）— v2 补充
+
+`_scrollbar.scss` 跨抽象层用 capsule token 是 spec 缺口（capsule 是 UI 元素，scrollbar 是浏览器 chrome，语义不该共享）。v2 拆出独立 token：
+
+| Token | 值 | 用途 |
+|---|---|---|
+| `--scrollbar-thumb` | `217 91% 60% / 0.4` | 滚动条 thumb 默认 |
+| `--scrollbar-thumb-hover` | `217 91% 60% / 0.7` | 滚动条 thumb hover |
+
 ## 2. 字号与排版（Typography Tokens）
 
 ### 2.1 Font Family

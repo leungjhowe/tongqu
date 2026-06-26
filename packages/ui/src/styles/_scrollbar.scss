@@ -1,7 +1,7 @@
 // 全局滚动条样式 — 细圆角蓝灰，hover 加亮
 * {
   scrollbar-width: thin;
-  scrollbar-color: hsl(var(--capsule-border-active) / 0.4) transparent;
+  scrollbar-color: hsl(var(--scrollbar-thumb)) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -14,13 +14,13 @@
 }
 
 *::-webkit-scrollbar-thumb {
-  background: hsl(var(--capsule-border-active) / 0.4);
+  background: hsl(var(--scrollbar-thumb));
   border-radius: 4px;
   transition: background 200ms ease;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--capsule-border-active) / 0.7);
+  background: hsl(var(--scrollbar-thumb-hover));
 }
 
 *::-webkit-scrollbar-corner {
