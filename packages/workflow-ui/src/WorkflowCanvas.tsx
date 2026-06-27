@@ -8,7 +8,6 @@ import {
 import 'reactflow/dist/style.css';
 import type { WorkflowGraph, WorkflowNode } from '@tps/workflow-core';
 import NodeEditor from './NodeEditor';
-import ChatPopover from './ChatPopover';
 
 export interface NodeChatMessage {
   id: string;
@@ -136,29 +135,6 @@ export function WorkflowCanvas({
         <Background gap={32} size={1} color="#1f2937" />
         <Controls />
         <MiniMap pannable zoomable />
-        {/* Chat 浮层 — 跟随节点下方（tapNow 风格） */}
-        {activeNodeId && (
-          <ChatPopover
-            nodeId={activeNodeId}
-            content={activeNodeContent ?? ''}
-            messages={messages.get(activeNodeId) ?? []}
-            draft={drafts.get(activeNodeId) ?? ''}
-            pending={pendingNodeIds.has(activeNodeId)}
-            onContentChange={(v) => {
-              const n = graph.nodes.find((nn) => nn.id === activeNodeId);
-              if (n) {
-                onUpdateNode?.(n.id, {
-                  params: { ...n.params, content: v },
-                });
-              }
-            }}
-            onDraftChange={(t) => onDraftChange?.(activeNodeId, t)}
-            onSend={() => {
-              const text = (drafts.get(activeNodeId) ?? '').trim();
-              if (text) onSendChat(activeNodeId, text);
-            }}
-          />
-        )}
       </ReactFlow>
     </div>
   );

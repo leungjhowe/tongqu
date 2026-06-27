@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useStoreApi } from 'reactflow';
+import { useReactFlow } from 'reactflow';
 import { Send, Plus } from 'lucide-react';
 import type { NodeChatMessage } from './WorkflowCanvas';
 
@@ -14,21 +14,10 @@ interface ChatPopoverProps {
   onSend: () => void;
 }
 
-interface NodePos {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  tx: number;
-  ty: number;
-  zoom: number;
-}
-
 /**
  * tapNow 风格的 AI 对话浮层 — 跟随节点下方 12px。
  *
- * 用 useStoreApi 直接订阅 React Flow store（不依赖 useStore 的
- * shallow equality 行为），每次 store 变化 forceUpdate。
+ * 假设父级已经包了 <ReactFlowProvider>，用 useReactFlow 共享 store。
  */
 export default function ChatPopover({
   nodeId,
@@ -40,37 +29,24 @@ export default function ChatPopover({
   onDraftChange,
   onSend,
 }: ChatPopoverProps) {
-  const store = useStoreApi();
-  const [pos, setPos] = useState<NodePos | null>(null);
+  const rf = useReactFlow();
+  const [tick, setTick] = useState(0); // 强制 re-render 用
   const listRef = useRef<HTMLDivElement>(null);
-  const force = useState(0)[1]; // 没用，备用
 
+  // 订阅 rf store 变化（拖动 / 缩放）
   useEffect(() => {
-    const updatePos = () => {
-      const s: any = store.getState();
-      const node = s.nodeLookup?.get(nodeId);
-      const absPos = node?.internals?.positionAbsolute;
-      const measured = node?.measured;
-      const t = s.transform as [number, number, number];
-      if (!absPos) {
-        setPos(null);
-        return;
-      }
-      setPos({
-        x: absPos.x,
-        y: absPos.y,
-        width: measured?.width ?? 240,
-        height: measured?.height ?? 160,
-        tx: t[0],
-        ty: t[1],
-        zoom: t[2],
-      });
-    };
-
-    updatePos();
-    const unsubscribe = store.subscribe(updatePos);
-    return () => unsubscribe();
-  }, [nodeId, store]);
+    const unsubscribe = rf.setViewport; // dummy subscribe check
+    void unsubscribe;
+    // 实际订阅：用 storeApi
+    const api: any = (rf as any).store || rf;
+    const store = api.getState ? api : api.store?.getState ? api.store : null;
+    if (store && typeof store.subscribe === 'function') {
+      const cb = () => setTick((t) => t + 1);
+      const off = store.subscribe(cb);
+      return () => off();
+    }
+    return;
+  }, [rf]);
 
   useEffect(() => {
     listRef.current?.scrollTo({
@@ -79,19 +55,25 @@ export default function ChatPopover({
     });
   }, [messages.length, pending]);
 
-  if (!pos) {
+  const node = rf.getNode(nodeId);
+  if (!node) {
     return (
       <div
         className="absolute pointer-events-none border-2 border-red-500 bg-red-500/30 p-1 text-[10px] text-red-500"
         style={{ left: 0, top: 0 }}
       >
-        CP-debug: pos=null, nodeId={nodeId}
+        CP-debug: getNode returned null, nodeId={nodeId}
       </div>
     );
   }
 
-  const screenX = (pos.x + pos.width / 2) * pos.zoom + pos.tx;
-  const screenY = (pos.y + pos.height) * pos.zoom + pos.ty + 12;
+  // getViewport() 返回 { x, y, zoom }
+  const vp = rf.getViewport();
+  const measured = (node as any).measured ?? { width: 240, height: 160 };
+  const width = measured.width ?? 240;
+  const height = measured.height ?? 160;
+  const screenX = (node.position.x + width / 2) * vp.zoom + vp.x;
+  const screenY = (node.position.y + height) * vp.zoom + vp.y + 12;
 
   return (
     <>
@@ -99,7 +81,7 @@ export default function ChatPopover({
         className="absolute pointer-events-none border-2 border-yellow-500 bg-yellow-500/20 p-1 text-[10px] text-yellow-300"
         style={{ left: 0, top: 0 }}
       >
-        CP @{Math.round(screenX)},{Math.round(screenY)} z={pos.zoom.toFixed(2)} node={nodeId}
+        CP @{Math.round(screenX)},{Math.round(screenY)} z={vp.zoom.toFixed(2)} tick={tick}
       </div>
       <div
         className="absolute pointer-events-none"

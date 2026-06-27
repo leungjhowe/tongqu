@@ -1,6 +1,11 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { WorkflowCanvas, type NodeChatMessage } from "@tps/workflow-ui";
+import { ReactFlowProvider } from "reactflow";
+import {
+  WorkflowCanvas,
+  ChatPopover,
+  type NodeChatMessage,
+} from "@tps/workflow-ui";
 import { getProjectById, touchProject, type Project } from "@tps/data-core";
 import type { WorkflowGraph, WorkflowNode } from "@tps/workflow-core";
 import { ClaudeProvider, getStoredApiKey, type LLMMessage } from "@tps/ai-core";
@@ -225,27 +230,55 @@ export default function WorkspaceProject() {
         <WorkflowToolbar onAddNode={handleAddNode} />
       </div>
 
-      <div className="flex-1 min-h-0">
-        <WorkflowCanvas
-          graph={graph}
-          activeNodeId={activeNodeId}
-          activeNodeContent={(() => {
-            const n = graph.nodes.find((nn) => nn.id === activeNodeId);
-            if (!n) return undefined;
-            return (n.params.content as string | undefined) ?? n.title ?? '';
-          })()}
-          messages={nodeMessages}
-          drafts={nodeDrafts}
-          pendingNodeIds={pendingNodeIds}
-          onNodeClick={handleNodeClick}
-          onNodeDoubleClick={handleNodeDoubleClick}
-          onPaneClick={handlePaneClick}
-          onNodeDragStop={handleNodeDragStop}
-          onUpdateNode={handleUpdateNode}
-          onDraftChange={handleDraftChange}
-          onSendChat={handleSendChat}
-        />
-      </div>
+      {/* 一个 ReactFlowProvider 包住主画布 + ChatPopover，
+          两者共享同一份 store（getNode / getViewport 才能拿到画布状态） */}
+      <ReactFlowProvider>
+        <div className="flex-1 min-h-0 relative">
+          <WorkflowCanvas
+            graph={graph}
+            activeNodeId={activeNodeId}
+            messages={nodeMessages}
+            drafts={nodeDrafts}
+            pendingNodeIds={pendingNodeIds}
+            onNodeClick={handleNodeClick}
+            onNodeDoubleClick={handleNodeDoubleClick}
+            onPaneClick={handlePaneClick}
+            onNodeDragStop={handleNodeDragStop}
+            onUpdateNode={handleUpdateNode}
+            onDraftChange={handleDraftChange}
+            onSendChat={handleSendChat}
+          />
+          {activeNodeId && (
+            <ChatPopover
+              nodeId={activeNodeId}
+              content={
+                (graph.nodes
+                  .find((n) => n.id === activeNodeId)
+                  ?.params.content as string | undefined) ?? ''
+              }
+              messages={nodeMessages.get(activeNodeId) ?? []}
+              draft={nodeDrafts.get(activeNodeId) ?? ''}
+              pending={pendingNodeIds.has(activeNodeId)}
+              onContentChange={(v) =>
+                handleUpdateNode(activeNodeId, {
+                  params: {
+                    ...(graph.nodes.find((n) => n.id === activeNodeId)
+                      ?.params ?? {}),
+                    content: v,
+                  },
+                })
+              }
+              onDraftChange={(t) => handleDraftChange(activeNodeId, t)}
+              onSend={() => {
+                const text = (
+                  nodeDrafts.get(activeNodeId) ?? ''
+                ).trim();
+                if (text) handleSendChat(activeNodeId, text);
+              }}
+            />
+          )}
+        </div>
+      </ReactFlowProvider>
     </main>
   );
 }
