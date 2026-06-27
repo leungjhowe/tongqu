@@ -3,6 +3,9 @@ import { useStoreApi } from 'reactflow';
 import { Plus } from 'lucide-react';
 import type { WorkflowNode } from '@tps/workflow-core';
 
+const DBG = (tag: string, data: any) =>
+  console.log(`[conn][${tag}]`, JSON.stringify(data));
+
 interface HandlePos {
   nodeId: string;
   side: 'source' | 'target';
@@ -88,51 +91,95 @@ export default function ConnectionOverlay({
     const container = containerRef.current;
     if (!container) return;
 
+    DBG('init', {
+      containerFound: !!container,
+      tag: container.tagName,
+      rect: container.getBoundingClientRect(),
+    });
+
     const onPointerDown = (e: PointerEvent) => {
+      const containerRect = container.getBoundingClientRect();
+      DBG('pointerdown', {
+        client: [e.clientX, e.clientY],
+        button: e.button,
+        target: (e.target as Element).tagName + '.' + (e.target as Element).className,
+        containerRect: {
+          x: containerRect.x,
+          y: containerRect.y,
+          width: containerRect.width,
+          height: containerRect.height,
+        },
+      });
+
       if (e.button !== 0) return;
-      const rect = container.getBoundingClientRect();
-      const cursor = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+
+      const cursor = { x: e.clientX - containerRect.left, y: e.clientY - containerRect.top };
       const handles = computeHandles();
+      DBG('handles', {
+        count: handles.length,
+        sample: handles.slice(0, 2),
+        cursor,
+        threshold: START_THRESHOLD,
+      });
+
       let best: HandlePos | null = null;
       let bestDist = START_THRESHOLD;
+      const distances: Array<{ h: HandlePos; d: number }> = [];
       for (const h of handles) {
         const d = Math.hypot(h.x - cursor.x, h.y - cursor.y);
+        distances.push({ h, d });
         if (d <= bestDist) {
           best = h;
           bestDist = d;
         }
       }
-      if (!best) return;
+      distances.sort((a, b) => a.d - b.d);
+      DBG('distances', distances.slice(0, 4));
+      DBG('hit', best);
+
+      if (!best) {
+        DBG('no_hit', 'abort');
+        return;
+      }
       e.preventDefault();
       e.stopPropagation();
+      DBG('start_draw', { from: best, cursor });
       setDraw({ from: best, cursor });
     };
 
-    // capture 阶段确保我们比 React Flow 的 connectionindicator 先收到
     container.addEventListener('pointerdown', onPointerDown, { capture: true });
 
     const onPointerMove = (e: PointerEvent) => {
-      if (!drawRef.current) return;
-      const rect = container.getBoundingClientRect();
-      const cursor = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      const d = drawRef.current;
+      if (!d) return;
+      const containerRect = container.getBoundingClientRect();
+      const cursor = { x: e.clientX - containerRect.left, y: e.clientY - containerRect.top };
+
       if (rafRef.current) return;
       rafRef.current = requestAnimationFrame(() => {
         rafRef.current = 0;
-        if (!drawRef.current) return;
+        const cur = drawRef.current;
+        if (!cur) return;
         const handles = computeHandles();
-        const snap = findSnap(cursor, handles, drawRef.current.from);
-        setDraw({ ...drawRef.current!, cursor, snap: snap ?? undefined });
+        const snap = findSnap(cursor, handles, cur.from);
+        DBG('move', { cursor, snap: snap ?? null });
+        setDraw({ ...cur, cursor, snap: snap ?? undefined });
       });
     };
 
     const onPointerUp = () => {
       const current = drawRef.current;
+      DBG('pointerup', { draw: current });
       if (!current) return;
       if (current.snap) {
-        onConnect({
+        const conn = {
           source: current.from.side === 'source' ? current.from.nodeId : current.snap.nodeId,
           target: current.from.side === 'target' ? current.from.nodeId : current.snap.nodeId,
-        });
+        };
+        DBG('connect_fired', conn);
+        onConnect(conn);
+      } else {
+        DBG('connect_skipped', 'no_snap');
       }
       setDraw(null);
       if (rafRef.current) {
