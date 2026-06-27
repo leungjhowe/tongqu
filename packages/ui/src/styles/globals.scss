@@ -109,3 +109,12 @@ a {
     transform: translateY(0);
   }
 }
+
+/* 隐藏 React Flow 默认 handle 视觉（背景小圆点 + 白边），
+   让我们自定义的 NodeEditor 圆圈独占端口视觉 */
+.react-flow__handle {
+  background: transparent !important;
+  border: none !important;
+  width: 40px !important;
+  height: 40px !important;
+}
