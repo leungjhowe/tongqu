@@ -28,6 +28,7 @@ export default function NodeAttachments({
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
+    // dragging 从 true→false 时强制重新算位置（组件卸载→挂载后位置是旧的）
     if (!activeNodeId) {
       setPos(null);
       return;
@@ -47,7 +48,7 @@ export default function NodeAttachments({
       x: (p.x + w / 2) * zoom + tx,
       y: (p.y + h) * zoom + ty + 12,
     });
-  }, [activeNodeId, storeApi]);
+  }, [activeNodeId, dragging, storeApi]);
 
   if (!activeNodeId || !pos || dragging) return null;
 
