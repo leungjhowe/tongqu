@@ -7,9 +7,9 @@ interface NodeEditorProps extends NodeEditorData {
   nodeType?: string;
 }
 
-const ATTRACT_RANGE = 65; // px — 进入此范围开始跟随
-const RELEASE_RANGE = 72; // px — 超出此范围归位（+7 hysteresis 防抖）
-const FULL_SNAP = 5; // px — 此距离内完全对齐鼠标
+const ATTRACT_RANGE = 42; // px — 进入此范围开始跟随
+const RELEASE_RANGE = 50; // px — 超出此范围归位
+const FULL_SNAP = 8; // px — 此距离内完全对齐鼠标
 
 /**
  * 文本节点 — tapNow 风格。
@@ -55,14 +55,17 @@ function NodeEditorImpl(props: NodeEditorProps) {
           if (dist <= FULL_SNAP) {
             el.style.transform = `translate(${dx}px, ${dy}px)`;
             el.style.transition = 'none';
+            el.style.borderColor = '#ffffff';
           } else {
             const factor = Math.max(0, 1 - dist / RELEASE_RANGE);
             el.style.transform = `translate(${dx * factor}px, ${dy * factor}px)`;
             el.style.transition = 'transform 60ms ease-out';
+            el.style.borderColor = '';
           }
         } else if (el.style.transform !== '') {
           el.style.transform = '';
           el.style.transition = 'transform 200ms cubic-bezier(0.2, 0, 0, 1)';
+          el.style.borderColor = '';
         }
       };
 
@@ -86,7 +89,7 @@ function NodeEditorImpl(props: NodeEditorProps) {
       <Handle
         type="target"
         position={Position.Left}
-        className="!w-8 !h-8 !bg-transparent !border-0 !rounded-full !-left-[30px] !flex !items-center !justify-center"
+        className="!w-8 !h-8 !bg-transparent !border-0 !rounded-full !-left-[48px] !flex !items-center !justify-center"
       >
         <span
           ref={targetRef}
@@ -99,7 +102,7 @@ function NodeEditorImpl(props: NodeEditorProps) {
       <Handle
         type="source"
         position={Position.Right}
-        className="!w-8 !h-8 !bg-transparent !border-0 !rounded-full !-right-[30px] !flex !items-center !justify-center"
+        className="!w-8 !h-8 !bg-transparent !border-0 !rounded-full !-right-[48px] !flex !items-center !justify-center"
       >
         <span
           ref={sourceRef}
