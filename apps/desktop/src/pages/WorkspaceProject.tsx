@@ -224,6 +224,11 @@ export default function WorkspaceProject() {
         <WorkflowCanvas
           graph={graph}
           activeNodeId={activeNodeId}
+          activeNodeContent={(() => {
+            const n = graph.nodes.find((nn) => nn.id === activeNodeId);
+            if (!n) return undefined;
+            return (n.params.content as string | undefined) ?? n.title ?? '';
+          })()}
           messages={nodeMessages}
           drafts={nodeDrafts}
           pendingNodeIds={pendingNodeIds}
