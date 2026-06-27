@@ -1,11 +1,9 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { SplitLayout } from "@tps/ui";
-import { WorkflowCanvas } from "@tps/workflow-ui";
+import { WorkflowCanvas, type NodeChatMessage } from "@tps/workflow-ui";
 import { getProjectById, touchProject, type Project } from "@tps/data-core";
 import type { WorkflowGraph, WorkflowNode } from "@tps/workflow-core";
 import { ClaudeProvider, getStoredApiKey, type LLMMessage } from "@tps/ai-core";
-import NodeDetailPanel, { type ChatMessage } from "@/components/workflow/NodeDetailPanel";
 import WorkflowToolbar from "@/components/workflow/WorkflowToolbar";
 
 /** 空工作流图（初始状态）。 */
@@ -19,116 +17,42 @@ export default function WorkspaceProject() {
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [graph, setGraph] = useState<WorkflowGraph>(EMPTY_GRAPH);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [nodeMessages, setNodeMessages] = useState<Map<string, ChatMessage[]>>(
+  // 双击激活的节点（编辑器展开）
+  const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
+  const [nodeMessages, setNodeMessages] = useState<Map<string, NodeChatMessage[]>>(
     () => new Map()
   );
   const [nodeDrafts, setNodeDrafts] = useState<Map<string, string>>(
     () => new Map()
   );
-
-  // 当前选中节点对象
-  const selectedNode =
-    graph.nodes.find((n) => n.id === selectedNodeId) ?? null;
-  const currentMessages = selectedNodeId
-    ? nodeMessages.get(selectedNodeId) ?? []
-    : [];
-  const currentDraft = selectedNodeId
-    ? nodeDrafts.get(selectedNodeId) ?? ""
-    : "";
+  // AI 正在响应的节点（用于显示"AI 思考中"）
+  const [pendingNodeIds, setPendingNodeIds] = useState<Set<string>>(
+    () => new Set()
+  );
 
   const msgCounter = useRef(0);
-  // Keep a ref to graph so the chat callback doesn't need it as a dep.
+  // 始终指向最新的 graph，让 chat 回调不需要把它列为依赖
   const graphRef = useRef(graph);
   graphRef.current = graph;
 
-  const handleNodeChat = useCallback(
-    async (nodeId: string, text: string) => {
-      // 1) 添加用户消息
-      msgCounter.current += 1;
-      const userMsg: ChatMessage = {
-        id: `msg-${Date.now()}-${msgCounter.current}`,
-        role: "user",
-        content: text,
-      };
-      setNodeMessages((prev) => {
-        const next = new Map(prev);
-        const existing = next.get(nodeId) ?? [];
-        next.set(nodeId, [...existing, userMsg]);
-        return next;
-      });
-      // 清空该节点 draft
-      setNodeDrafts((prev) => {
-        const next = new Map(prev);
-        next.set(nodeId, "");
-        return next;
-      });
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
 
-      // 2) 获取当前节点的上下文
-      const currentNode = graphRef.current.nodes.find((n) => n.id === nodeId);
-
-      // 3) 调用 LLM
-      const apiKey = getStoredApiKey();
-      let aiContent: string;
-
-      if (!apiKey) {
-        aiContent =
-          "请先在浏览器 DevTools Console 中设置 API Key：\n```\nlocalStorage.setItem('tps-ai-provider-key', 'sk-ant-...')\n```\n或者系统设置中添加。";
-      } else {
-        try {
-          const provider = new ClaudeProvider(apiKey);
-          const messages: LLMMessage[] = [
-            {
-              role: "system",
-              content: `你是 TPS 交通规划 AI 工作流系统的助手。用户正在配置一个工作流节点。\n\n节点信息：\n- ID: ${nodeId}\n- 类型: ${currentNode?.type ?? "未知"}\n- 标题: ${currentNode?.title ?? "未知"}\n- 参数: ${JSON.stringify(currentNode?.params ?? {})}\n\n请用中文简洁回答，针对用户的问题提供帮助。回答控制在 200 字以内。`,
-            },
-            { role: "user", content: text },
-          ];
-
-          const res = await provider.complete({
-            provider: "claude",
-            model: "claude-sonnet-4-20250514",
-            messages,
-            maxTokens: 512,
-          });
-          aiContent = res.content;
-        } catch (err) {
-          aiContent = `AI 回复失败：${err instanceof Error ? err.message : "未知错误"}`;
-        }
+    const load = async () => {
+      try {
+        const p = await getProjectById(id);
+        if (!cancelled) setProject(p);
+        await touchProject(id);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-
-      // 4) 添加 AI 回复
-      msgCounter.current += 1;
-      const aiMsg: ChatMessage = {
-        id: `msg-${Date.now()}-${msgCounter.current}`,
-        role: "ai",
-        content: aiContent,
-      };
-      setNodeMessages((prev) => {
-        const next = new Map(prev);
-        const existing = next.get(nodeId) ?? [];
-        next.set(nodeId, [...existing, aiMsg]);
-        return next;
-      });
-    },
-    []
-  );
-
-  const handleNodeDraftChange = useCallback(
-    (text: string) => {
-      if (!selectedNodeId) return;
-      setNodeDrafts((prev) => {
-        const next = new Map(prev);
-        next.set(selectedNodeId, text);
-        return next;
-      });
-    },
-    [selectedNodeId]
-  );
-
-  const handleCloseDetail = useCallback(() => {
-    setSelectedNodeId(null);
-  }, []);
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
   /** 更新节点局部字段（title/type/params） */
   const handleUpdateNode = useCallback(
@@ -151,31 +75,127 @@ export default function WorkspaceProject() {
       type: _type,
       title: "文本节点",
       params: { content: "" },
-      position: { x: 100 + (nodeCounter % 5) * 200, y: 150 + Math.floor(nodeCounter / 5) * 120 },
+      position: {
+        x: 100 + (nodeCounter % 5) * 240,
+        y: 150 + Math.floor(nodeCounter / 5) * 160,
+      },
     };
     setGraph((prev) => ({
       ...prev,
       nodes: [...prev.nodes, newNode],
     }));
+    // 新增后自动激活，方便直接编辑
+    setActiveNodeId(nodeId);
   }, []);
 
-  useEffect(() => {
-    if (!id) return;
-    let cancelled = false;
+  /** 单击节点：选中（同时激活编辑器） */
+  const handleNodeClick = useCallback((nodeId: string) => {
+    setActiveNodeId(nodeId);
+  }, []);
 
-    const load = async () => {
-      try {
-        const p = await getProjectById(id);
-        if (!cancelled) setProject(p);
-        // 标记为已打开
-        await touchProject(id);
-      } finally {
-        if (!cancelled) setLoading(false);
+  /** 双击节点：激活 */
+  const handleNodeDoubleClick = useCallback((nodeId: string) => {
+    setActiveNodeId(nodeId);
+  }, []);
+
+  /** 节点拖动结束：保存新位置 */
+  const handleNodeDragStop = useCallback(
+    (nodeId: string, position: { x: number; y: number }) => {
+      handleUpdateNode(nodeId, { position });
+    },
+    [handleUpdateNode]
+  );
+
+  /** 更新某节点的草稿（输入框实时绑定） */
+  const handleDraftChange = useCallback((nodeId: string, text: string) => {
+    setNodeDrafts((prev) => {
+      const next = new Map(prev);
+      next.set(nodeId, text);
+      return next;
+    });
+  }, []);
+
+  /** 发送节点对话 */
+  const handleSendChat = useCallback(
+    async (nodeId: string, text: string) => {
+      // 1) 用户消息入栈
+      msgCounter.current += 1;
+      const userMsg: NodeChatMessage = {
+        id: `msg-${Date.now()}-${msgCounter.current}`,
+        role: "user",
+        content: text,
+      };
+      setNodeMessages((prev) => {
+        const next = new Map(prev);
+        next.set(nodeId, [...(next.get(nodeId) ?? []), userMsg]);
+        return next;
+      });
+      // 2) 清空草稿
+      setNodeDrafts((prev) => {
+        const next = new Map(prev);
+        next.set(nodeId, "");
+        return next;
+      });
+      // 3) 标记 pending
+      setPendingNodeIds((prev) => {
+        const next = new Set(prev);
+        next.add(nodeId);
+        return next;
+      });
+
+      // 4) 取节点上下文
+      const node = graphRef.current.nodes.find((n) => n.id === nodeId);
+
+      // 5) 调 LLM
+      let aiContent: string;
+      const apiKey = getStoredApiKey();
+
+      if (!apiKey) {
+        aiContent =
+          "请先在 DevTools Console 设置 API Key：\n```\nlocalStorage.setItem('tps-ai-provider-key', 'sk-ant-...')\n```";
+      } else {
+        try {
+          const provider = new ClaudeProvider(apiKey);
+          const messages: LLMMessage[] = [
+            {
+              role: "system",
+              content: `你是 TPS 交通规划 AI 工作流系统的助手。\n节点：${node?.title ?? nodeId} (${node?.type ?? "未知"})\n参数：${JSON.stringify(node?.params ?? {})}\n用中文简洁回答，200 字以内。`,
+            },
+            { role: "user", content: text },
+          ];
+          const res = await provider.complete({
+            provider: "claude",
+            model: "claude-sonnet-4-20250514",
+            messages,
+            maxTokens: 512,
+          });
+          aiContent = res.content;
+        } catch (err) {
+          aiContent = `AI 回复失败：${err instanceof Error ? err.message : "未知错误"}`;
+        }
       }
-    };
-    void load();
-    return () => { cancelled = true; };
-  }, [id]);
+
+      // 6) AI 消息入栈
+      msgCounter.current += 1;
+      const aiMsg: NodeChatMessage = {
+        id: `msg-${Date.now()}-${msgCounter.current}`,
+        role: "ai",
+        content: aiContent,
+      };
+      setNodeMessages((prev) => {
+        const next = new Map(prev);
+        next.set(nodeId, [...(next.get(nodeId) ?? []), aiMsg]);
+        return next;
+      });
+      // 7) 取消 pending
+      setPendingNodeIds((prev) => {
+        const next = new Set(prev);
+        next.delete(nodeId);
+        return next;
+      });
+    },
+    []
+  );
 
   if (loading) {
     return (
@@ -194,35 +214,25 @@ export default function WorkspaceProject() {
   }
 
   return (
-    <main className="flex-1 flex flex-col min-h-0 bg-background">
-      <div className="relative flex-1 flex min-h-0">
-        {/* 漂浮胶囊工具栏 */}
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 z-floating">
-          <WorkflowToolbar onAddNode={handleAddNode} />
-        </div>
+    <main className="flex-1 flex flex-col min-h-0 bg-background relative">
+      {/* 漂浮胶囊工具栏 */}
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 z-floating">
+        <WorkflowToolbar onAddNode={handleAddNode} />
+      </div>
 
-        <SplitLayout
-          center={
-            <WorkflowCanvas
-              graph={graph}
-              readOnly
-              onNodeClick={(nodeId) => setSelectedNodeId(nodeId)}
-            />
-          }
-          right={
-            selectedNodeId ? (
-              <NodeDetailPanel
-                node={selectedNode}
-                messages={currentMessages}
-                draft={currentDraft}
-                onDraftChange={handleNodeDraftChange}
-                onSend={handleNodeChat}
-                onClose={handleCloseDetail}
-                onUpdateNode={handleUpdateNode}
-              />
-            ) : undefined
-          }
-          rightWidth={360}
+      <div className="flex-1 min-h-0">
+        <WorkflowCanvas
+          graph={graph}
+          activeNodeId={activeNodeId}
+          messages={nodeMessages}
+          drafts={nodeDrafts}
+          pendingNodeIds={pendingNodeIds}
+          onNodeClick={handleNodeClick}
+          onNodeDoubleClick={handleNodeDoubleClick}
+          onNodeDragStop={handleNodeDragStop}
+          onUpdateNode={handleUpdateNode}
+          onDraftChange={handleDraftChange}
+          onSendChat={handleSendChat}
         />
       </div>
     </main>
