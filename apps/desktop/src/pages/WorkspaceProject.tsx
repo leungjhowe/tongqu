@@ -114,9 +114,15 @@ export default function WorkspaceProject() {
     setActiveNodeId(null);
   }, []);
 
-  /** 节点拖动结束：保存新位置 */
-  const handleNodeDragStop = useCallback(
+  /** 拖动开始 → 隐藏吸附（避免链路重渲染） */
+  const handleDragStart = useCallback(() => {
+    setNodeDragging(true);
+  }, []);
+
+  /** 拖动结束 → 更新位置 + 显示吸附 */
+  const handleDragStop = useCallback(
     (nodeId: string, position: { x: number; y: number }) => {
+      setNodeDragging(false);
       handleUpdateNode(nodeId, { position });
     },
     [handleUpdateNode]
