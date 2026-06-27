@@ -63,6 +63,9 @@ export default function ChatPopover({
 
   return (
     <Panel position="top-left" className="!m-0 !p-0 pointer-events-none">
+      <div className="border-2 border-red-500 bg-red-500/20 text-red-500 p-1 text-[10px] absolute pointer-events-none" style={{ left: 0, top: 0 }}>
+        chat popover @ {Math.round(screenX)},{Math.round(screenY)} w={Math.round(pos.width)} h={Math.round(pos.height)}
+      </div>
       <div
         className="absolute pointer-events-none"
         style={{
