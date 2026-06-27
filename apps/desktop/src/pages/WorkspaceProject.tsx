@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { ReactFlowProvider } from "reactflow";
+import { ReactFlowProvider, type NodeChange } from "reactflow";
 import {
   WorkflowCanvas,
   NodeAttachments,
@@ -248,7 +248,18 @@ export default function WorkspaceProject() {
             onNodeClick={handleNodeClick}
             onNodeDoubleClick={handleNodeDoubleClick}
             onPaneClick={handlePaneClick}
+            onNodeDragStart={handleDragStart}
+            onNodesChange={(changes: NodeChange[]) => {
+              // React Flow 11 controlled mode 必备：
+              // onNodesChange 实时写回拖拽的位置变化
+              for (const c of changes) {
+                if (c.type === 'position' && c.position) {
+                  handleUpdateNode(c.id, { position: c.position });
+                }
+              }
+            }}
             onNodeDragStop={handleNodeDragStop}
+            attachmentDragging={nodeDragging}
             onUpdateNode={handleUpdateNode}
             onDraftChange={handleDraftChange}
             onSendChat={handleSendChat}

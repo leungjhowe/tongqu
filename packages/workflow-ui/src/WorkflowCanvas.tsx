@@ -4,6 +4,8 @@ import {
   Background,
   Controls,
   MiniMap,
+  applyNodeChanges,
+  type NodeChange,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import type { WorkflowGraph, WorkflowNode } from '@tps/workflow-core';
@@ -40,6 +42,8 @@ export interface WorkflowCanvasProps {
   onPaneClick?: () => void;
   onNodeDragStart?: (nodeId: string) => void;
   onNodeDragStop?: (nodeId: string, position: { x: number; y: number }) => void;
+  /** 节点变更（React Flow 必要 — 含拖拽过程中的位置更新）。接 applyNodeChanges 后写回 graph */
+  onNodesChange?: (changes: NodeChange[]) => void;
   onUpdateNode?: (nodeId: string, patch: Partial<WorkflowNode>) => void;
   messages: Map<string, NodeChatMessage[]>;
   drafts: Map<string, string>;
@@ -61,6 +65,7 @@ export const WorkflowCanvas = memo(function WorkflowCanvas({
   onPaneClick,
   onNodeDragStart,
   onNodeDragStop,
+  onNodesChange,
   onUpdateNode,
   messages,
   drafts,
@@ -135,23 +140,21 @@ export const WorkflowCanvas = memo(function WorkflowCanvas({
         nodesConnectable={!readOnly}
         elementsSelectable
         nodeTypes={nodeTypes}
-        // 暂时清除所有 pan 限制 — 使用 React Flow 默认值
         panOnDrag
         panOnScroll
         selectionOnDrag
+        onNodesChange={(changes) => onNodesChange?.(changes)}
         onNodeClick={(_, n) => onNodeClick?.(n.id)}
         onNodeDoubleClick={(_, n) => onNodeDoubleClick?.(n.id)}
         onPaneClick={() => onPaneClick?.()}
         onNodeDragStart={(_, n) => {
-          console.log('[drag-debug] dragStart', n.id, n.position);
+          // console.log('[drag-debug] dragStart', n.id, n.position);
           onNodeDragStart?.(n.id);
         }}
         onNodeDrag={(_, n) => {
-          // 拖拽时每帧打印节点位置（确认鼠标跟随）
-          console.log('[drag-debug] drag', n.id, 'pos', n.position);
+          // console.log('[drag-debug] drag', n.id, 'pos', n.position);
         }}
         onNodeDragStop={(_, n) => {
-          console.log('[drag-debug] dragStop', n.id, n.position);
           onNodeDragStop?.(n.id, n.position);
         }}
         fitView
