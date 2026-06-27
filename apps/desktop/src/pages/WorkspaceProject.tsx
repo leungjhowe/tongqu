@@ -25,8 +25,7 @@ export default function WorkspaceProject() {
   const [graph, setGraph] = useState<WorkflowGraph>(EMPTY_GRAPH);
   // 双击激活的节点（编辑器展开）
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
-  // 节点拖动中 → 隐藏吸附浮层
-  const [nodeDragging, setNodeDragging] = useState(false);
+  // 拖动中标识 — 预留；当前先关闭以避免 state 变化触发 ReactFlow 重渲染破坏拖拽
   const [nodeMessages, setNodeMessages] = useState<Map<string, NodeChatMessage[]>>(
     () => new Map()
   );
@@ -114,15 +113,9 @@ export default function WorkspaceProject() {
     setActiveNodeId(null);
   }, []);
 
-  /** 拖动开始 → 隐藏吸附（避免链路重渲染） */
-  const handleDragStart = useCallback(() => {
-    setNodeDragging(true);
-  }, []);
-
-  /** 拖动结束 → 更新位置 + 显示吸附 */
-  const handleDragStop = useCallback(
+  /** 节点拖动结束：保存新位置 */
+  const handleNodeDragStop = useCallback(
     (nodeId: string, position: { x: number; y: number }) => {
-      setNodeDragging(false);
       handleUpdateNode(nodeId, { position });
     },
     [handleUpdateNode]
@@ -255,12 +248,10 @@ export default function WorkspaceProject() {
             onNodeClick={handleNodeClick}
             onNodeDoubleClick={handleNodeDoubleClick}
             onPaneClick={handlePaneClick}
-            onNodeDragStart={handleDragStart}
-            onNodeDragStop={handleDragStop}
+            onNodeDragStop={handleNodeDragStop}
             onUpdateNode={handleUpdateNode}
             onDraftChange={handleDraftChange}
             onSendChat={handleSendChat}
-            attachmentDragging={nodeDragging}
             attachment={
               activeNodeId ? (
                 <ChatPanel
