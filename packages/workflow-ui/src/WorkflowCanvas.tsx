@@ -37,6 +37,7 @@ export interface WorkflowCanvasProps {
   activeNodeContent?: string;
   onNodeClick?: (nodeId: string) => void;
   onNodeDoubleClick?: (nodeId: string) => void;
+  onPaneClick?: () => void;
   onNodeDragStop?: (nodeId: string, position: { x: number; y: number }) => void;
   onUpdateNode?: (nodeId: string, patch: Partial<WorkflowNode>) => void;
   messages: Map<string, NodeChatMessage[]>;
@@ -53,6 +54,7 @@ export function WorkflowCanvas({
   activeNodeContent,
   onNodeClick,
   onNodeDoubleClick,
+  onPaneClick,
   onNodeDragStop,
   onUpdateNode,
   messages,
@@ -127,6 +129,7 @@ export function WorkflowCanvas({
         nodeTypes={nodeTypes}
         onNodeClick={(_, n) => onNodeClick?.(n.id)}
         onNodeDoubleClick={(_, n) => onNodeDoubleClick?.(n.id)}
+        onPaneClick={() => onPaneClick?.()}
         onNodeDragStop={(_, n) => onNodeDragStop?.(n.id, n.position)}
         fitView
       >

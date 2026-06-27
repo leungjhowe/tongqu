@@ -98,6 +98,11 @@ export default function WorkspaceProject() {
     setActiveNodeId(nodeId);
   }, []);
 
+  /** 点击画布空白：取消激活 */
+  const handlePaneClick = useCallback(() => {
+    setActiveNodeId(null);
+  }, []);
+
   /** 节点拖动结束：保存新位置 */
   const handleNodeDragStop = useCallback(
     (nodeId: string, position: { x: number; y: number }) => {
@@ -234,6 +239,7 @@ export default function WorkspaceProject() {
           pendingNodeIds={pendingNodeIds}
           onNodeClick={handleNodeClick}
           onNodeDoubleClick={handleNodeDoubleClick}
+          onPaneClick={handlePaneClick}
           onNodeDragStop={handleNodeDragStop}
           onUpdateNode={handleUpdateNode}
           onDraftChange={handleDraftChange}
