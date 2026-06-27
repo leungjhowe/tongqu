@@ -4,6 +4,7 @@ import { SplitLayout } from "@tps/ui";
 import { WorkflowCanvas } from "@tps/workflow-ui";
 import { getProjectById, touchProject, type Project } from "@tps/data-core";
 import type { WorkflowGraph, WorkflowNode } from "@tps/workflow-core";
+import { ClaudeProvider, getStoredApiKey, type LLMMessage } from "@tps/ai-core";
 import NodeDetailPanel, { type ChatMessage } from "@/components/workflow/NodeDetailPanel";
 import WorkflowToolbar from "@/components/workflow/WorkflowToolbar";
 
@@ -37,9 +38,13 @@ export default function WorkspaceProject() {
     : "";
 
   const msgCounter = useRef(0);
+  // Keep a ref to graph so the chat callback doesn't need it as a dep.
+  const graphRef = useRef(graph);
+  graphRef.current = graph;
 
   const handleNodeChat = useCallback(
-    (nodeId: string, text: string) => {
+    async (nodeId: string, text: string) => {
+      // 1) 添加用户消息
       msgCounter.current += 1;
       const userMsg: ChatMessage = {
         id: `msg-${Date.now()}-${msgCounter.current}`,
@@ -59,21 +64,52 @@ export default function WorkspaceProject() {
         return next;
       });
 
-      // 2) 模拟 AI 回复（延迟 600ms）
-      setTimeout(() => {
-        msgCounter.current += 1;
-        const aiMsg: ChatMessage = {
-          id: `msg-${Date.now()}-${msgCounter.current}`,
-          role: "ai",
-          content: `已收到：${text}\n\n这个节点可以帮你完成相关任务。当前配置已保存。`,
-        };
-        setNodeMessages((prev) => {
-          const next = new Map(prev);
-          const existing = next.get(nodeId) ?? [];
-          next.set(nodeId, [...existing, aiMsg]);
-          return next;
-        });
-      }, 600);
+      // 2) 获取当前节点的上下文
+      const currentNode = graphRef.current.nodes.find((n) => n.id === nodeId);
+
+      // 3) 调用 LLM
+      const apiKey = getStoredApiKey();
+      let aiContent: string;
+
+      if (!apiKey) {
+        aiContent =
+          "请先在浏览器 DevTools Console 中设置 API Key：\n```\nlocalStorage.setItem('tps-ai-provider-key', 'sk-ant-...')\n```\n或者系统设置中添加。";
+      } else {
+        try {
+          const provider = new ClaudeProvider(apiKey);
+          const messages: LLMMessage[] = [
+            {
+              role: "system",
+              content: `你是 TPS 交通规划 AI 工作流系统的助手。用户正在配置一个工作流节点。\n\n节点信息：\n- ID: ${nodeId}\n- 类型: ${currentNode?.type ?? "未知"}\n- 标题: ${currentNode?.title ?? "未知"}\n- 参数: ${JSON.stringify(currentNode?.params ?? {})}\n\n请用中文简洁回答，针对用户的问题提供帮助。回答控制在 200 字以内。`,
+            },
+            { role: "user", content: text },
+          ];
+
+          const res = await provider.complete({
+            provider: "claude",
+            model: "claude-sonnet-4-20250514",
+            messages,
+            maxTokens: 512,
+          });
+          aiContent = res.content;
+        } catch (err) {
+          aiContent = `AI 回复失败：${err instanceof Error ? err.message : "未知错误"}`;
+        }
+      }
+
+      // 4) 添加 AI 回复
+      msgCounter.current += 1;
+      const aiMsg: ChatMessage = {
+        id: `msg-${Date.now()}-${msgCounter.current}`,
+        role: "ai",
+        content: aiContent,
+      };
+      setNodeMessages((prev) => {
+        const next = new Map(prev);
+        const existing = next.get(nodeId) ?? [];
+        next.set(nodeId, [...existing, aiMsg]);
+        return next;
+      });
     },
     []
   );

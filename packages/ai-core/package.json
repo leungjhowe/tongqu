@@ -19,6 +19,7 @@
     "clean": "rm -rf dist .tsbuildinfo"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.106.0",
     "@tps/shared": "workspace:*",
     "@tps/workflow-core": "workspace:*"
   },
