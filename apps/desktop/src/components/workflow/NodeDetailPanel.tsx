@@ -1,7 +1,15 @@
-import { useRef, useEffect } from "react";
-import { Input, Button } from "@tps/ui";
+import { useRef, useEffect, useState } from "react";
+import { Button } from "@tps/ui";
 import type { WorkflowNode } from "@tps/workflow-core";
-import { X, ChevronRight, Send } from "lucide-react";
+import {
+  X,
+  ChevronRight,
+  Send,
+  Pencil,
+  Check,
+  Plus,
+  Trash2,
+} from "lucide-react";
 
 export interface ChatMessage {
   id: string;
@@ -16,6 +24,8 @@ export interface NodeDetailPanelProps {
   onDraftChange: (text: string) => void;
   onSend: (nodeId: string, text: string) => void;
   onClose: () => void;
+  /** 更新节点局部字段（title/type/params），由父组件写回 graph state */
+  onUpdateNode: (nodeId: string, patch: Partial<WorkflowNode>) => void;
 }
 
 /** 节点类型的显示标签与色映射 */
@@ -34,6 +44,8 @@ const TYPE_META: Record<
   },
 };
 
+const TYPE_ORDER: WorkflowNode["type"][] = ["data", "transform", "output"];
+
 function NodeTypeTag({ type }: { type: WorkflowNode["type"] }) {
   const meta = TYPE_META[type];
   return (
@@ -45,24 +57,280 @@ function NodeTypeTag({ type }: { type: WorkflowNode["type"] }) {
   );
 }
 
-function ParamsTable({ params }: { params: Record<string, unknown> }) {
-  const entries = Object.entries(params);
-  if (entries.length === 0) {
+/* ---------- 可编辑标题 ---------- */
+function EditableTitle({
+  node,
+  onUpdate,
+}: {
+  node: WorkflowNode;
+  onUpdate: (title: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(node.title);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editing) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [editing]);
+
+  // 外部 title 变化时同步本地 value
+  useEffect(() => {
+    if (!editing) setValue(node.title);
+  }, [node.title, editing]);
+
+  const commit = () => {
+    const trimmed = value.trim();
+    if (trimmed && trimmed !== node.title) {
+      onUpdate(trimmed);
+    } else {
+      setValue(node.title);
+    }
+    setEditing(false);
+  };
+
+  if (editing) {
     return (
-      <span className="text-micro text-muted-foreground italic">无参数</span>
+      <input
+        ref={inputRef}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") commit();
+          if (e.key === "Escape") {
+            setValue(node.title);
+            setEditing(false);
+          }
+        }}
+        className="w-full text-h3 text-foreground bg-transparent border-b border-primary outline-none py-0"
+        aria-label="节点标题"
+      />
     );
   }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setEditing(true)}
+      className="group flex items-center gap-1.5 text-left min-w-0"
+      aria-label="编辑标题"
+    >
+      <h2 className="text-h3 text-foreground truncate">{node.title}</h2>
+      <Pencil className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+    </button>
+  );
+}
+
+/* ---------- 可循环切换类型标签 ---------- */
+function TypeSelector({
+  type,
+  onChange,
+}: {
+  type: WorkflowNode["type"];
+  onChange: (next: WorkflowNode["type"]) => void;
+}) {
+  const next = TYPE_ORDER[(TYPE_ORDER.indexOf(type) + 1) % TYPE_ORDER.length]!;
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(next)}
+      title={`点击切换为「${TYPE_META[next].label}」`}
+      className="inline-flex"
+    >
+      <NodeTypeTag type={type} />
+    </button>
+  );
+}
+
+/* ---------- 可编辑参数表 ---------- */
+function EditableParams({
+  params,
+  onChange,
+}: {
+  params: Record<string, unknown>;
+  onChange: (next: Record<string, unknown>) => void;
+}) {
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [newKey, setNewKey] = useState("");
+  const [newValue, setNewValue] = useState("");
+
+  const entries = Object.entries(params);
+
+  const updateValue = (k: string, v: string) => {
+    onChange({ ...params, [k]: v });
+  };
+
+  const renameKey = (oldK: string, newK: string) => {
+    if (oldK === newK || !newK.trim()) return;
+    const next: Record<string, unknown> = {};
+    for (const [key, val] of entries) {
+      next[key === oldK ? newK.trim() : key] = val;
+    }
+    onChange(next);
+  };
+
+  const remove = (k: string) => {
+    const next = { ...params };
+    delete next[k];
+    onChange(next);
+  };
+
+  const addRow = () => {
+    const k = newKey.trim();
+    if (!k || k in params) {
+      setNewKey("");
+      setNewValue("");
+      setAdding(false);
+      return;
+    }
+    onChange({ ...params, [k]: newValue });
+    setNewKey("");
+    setNewValue("");
+    setAdding(false);
+  };
+
   return (
     <div className="flex flex-col gap-1">
-      {entries.map(([k, v]) => (
-        <div key={k} className="flex items-center gap-2 text-micro">
-          <span className="text-muted-foreground font-mono">{k}</span>
-          <ChevronRight className="w-3 h-3 text-muted-foreground/50 shrink-0" />
-          <span className="text-foreground font-mono truncate">
-            {String(v)}
-          </span>
-        </div>
-      ))}
+      {entries.length === 0 && !adding && (
+        <span className="text-micro text-muted-foreground italic">无参数</span>
+      )}
+      {entries.map(([k, v]) =>
+        editingKey === k ? (
+          <KeyValueEditor
+            key={k}
+            initialKey={k}
+            initialValue={String(v)}
+            onCommit={(newK, newV) => {
+              renameKey(k, newK);
+              if (newK.trim() === k) updateValue(k, newV);
+              setEditingKey(null);
+            }}
+            onCancel={() => setEditingKey(null)}
+            onDelete={() => {
+              remove(k);
+              setEditingKey(null);
+            }}
+          />
+        ) : (
+          <button
+            key={k}
+            type="button"
+            onClick={() => setEditingKey(k)}
+            className="flex items-center gap-2 text-micro text-left w-full hover:bg-secondary/50 rounded px-1 -mx-1 py-0.5 transition-colors"
+          >
+            <span className="text-muted-foreground font-mono shrink-0">{k}</span>
+            <ChevronRight className="w-3 h-3 text-muted-foreground/50 shrink-0" />
+            <span className="text-foreground font-mono truncate">
+              {String(v)}
+            </span>
+            <Pencil className="w-3 h-3 text-muted-foreground opacity-0 hover:opacity-100 ml-auto shrink-0" />
+          </button>
+        )
+      )}
+
+      {adding ? (
+        <KeyValueEditor
+          initialKey={newKey}
+          initialValue={newValue}
+          onCommit={(k, v) => {
+            setNewKey(k);
+            setNewValue(v);
+            addRow();
+          }}
+          onCancel={() => {
+            setNewKey("");
+            setNewValue("");
+            setAdding(false);
+          }}
+          onDelete={null}
+          placeholder="新参数"
+        />
+      ) : (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => setAdding(true)}
+          className="self-start mt-1"
+        >
+          <Plus className="w-3 h-3 mr-1" />
+          添加参数
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function KeyValueEditor({
+  initialKey,
+  initialValue,
+  onCommit,
+  onCancel,
+  onDelete,
+  placeholder,
+}: {
+  initialKey: string;
+  initialValue: string;
+  onCommit: (k: string, v: string) => void;
+  onCancel: () => void;
+  onDelete: (() => void) | null;
+  placeholder?: string;
+}) {
+  const [k, setK] = useState(initialKey);
+  const [v, setV] = useState(initialValue);
+
+  return (
+    <div className="flex items-center gap-1 px-1 -mx-1">
+      <input
+        value={k}
+        onChange={(e) => setK(e.target.value)}
+        placeholder="key"
+        aria-label="参数名"
+        className="w-20 px-1 py-0.5 text-micro font-mono text-muted-foreground bg-background border border-border rounded outline-none focus:border-primary"
+      />
+      <ChevronRight className="w-3 h-3 text-muted-foreground/50 shrink-0" />
+      <input
+        value={v}
+        onChange={(e) => setV(e.target.value)}
+        placeholder={placeholder ?? "value"}
+        aria-label="参数值"
+        className="flex-1 px-1 py-0.5 text-micro font-mono text-foreground bg-background border border-border rounded outline-none focus:border-primary min-w-0"
+        autoFocus
+        onKeyDown={(e) => {
+          if (e.key === "Enter") onCommit(k.trim(), v);
+          if (e.key === "Escape") onCancel();
+        }}
+      />
+      <button
+        type="button"
+        onClick={() => onCommit(k.trim(), v)}
+        className="shrink-0 w-5 h-5 flex items-center justify-center text-success hover:bg-success/10 rounded transition-colors"
+        aria-label="保存"
+      >
+        <Check className="w-3 h-3" />
+      </button>
+      <button
+        type="button"
+        onClick={onCancel}
+        className="shrink-0 w-5 h-5 flex items-center justify-center text-muted-foreground hover:bg-secondary rounded transition-colors"
+        aria-label="取消"
+      >
+        <X className="w-3 h-3" />
+      </button>
+      {onDelete && (
+        <button
+          type="button"
+          onClick={onDelete}
+          className="shrink-0 w-5 h-5 flex items-center justify-center text-destructive hover:bg-destructive/10 rounded transition-colors"
+          aria-label="删除"
+        >
+          <Trash2 className="w-3 h-3" />
+        </button>
+      )}
     </div>
   );
 }
@@ -74,6 +342,7 @@ export default function NodeDetailPanel({
   onDraftChange,
   onSend,
   onClose,
+  onUpdateNode,
 }: NodeDetailPanelProps) {
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -113,17 +382,19 @@ export default function NodeDetailPanel({
     );
   }
 
-  const meta = TYPE_META[node.type];
-
   return (
     <aside className="flex flex-col h-full border-l border-border bg-card">
       {/* 标题栏 */}
       <div className="flex items-start justify-between gap-2 px-4 py-3 border-b border-border">
-        <div className="flex flex-col gap-1.5 min-w-0">
-          <div className="flex items-center gap-2">
-            <NodeTypeTag type={node.type} />
-          </div>
-          <h2 className="text-h3 text-foreground truncate">{node.title}</h2>
+        <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+          <TypeSelector
+            type={node.type}
+            onChange={(next) => onUpdateNode(node.id, { type: next })}
+          />
+          <EditableTitle
+            node={node}
+            onUpdate={(title) => onUpdateNode(node.id, { title })}
+          />
         </div>
         <button
           type="button"
@@ -140,7 +411,10 @@ export default function NodeDetailPanel({
         <div className="text-caption font-medium text-muted-foreground mb-2">
           参数
         </div>
-        <ParamsTable params={node.params} />
+        <EditableParams
+          params={node.params}
+          onChange={(next) => onUpdateNode(node.id, { params: next })}
+        />
       </div>
 
       {/* 聊天区 */}

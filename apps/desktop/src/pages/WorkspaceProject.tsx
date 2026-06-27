@@ -130,6 +130,19 @@ export default function WorkspaceProject() {
     setSelectedNodeId(null);
   }, []);
 
+  /** 更新节点局部字段（title/type/params） */
+  const handleUpdateNode = useCallback(
+    (nodeId: string, patch: Partial<WorkflowNode>) => {
+      setGraph((prev) => ({
+        ...prev,
+        nodes: prev.nodes.map((n) =>
+          n.id === nodeId ? { ...n, ...patch } : n
+        ),
+      }));
+    },
+    []
+  );
+
   /** 从左侧工具栏新增节点 */
   const handleAddNode = useCallback((_type: WorkflowNode["type"]) => {
     const nodeId = nextNodeId();
@@ -205,6 +218,7 @@ export default function WorkspaceProject() {
                 onDraftChange={handleNodeDraftChange}
                 onSend={handleNodeChat}
                 onClose={handleCloseDetail}
+                onUpdateNode={handleUpdateNode}
               />
             ) : undefined
           }
