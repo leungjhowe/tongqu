@@ -104,28 +104,28 @@ export function ChatPanel({
   }, [messages.length, pending]);
 
   return (
-    <div className="w-[360px] rounded-xl bg-card text-card-foreground shadow-elevation-3 overflow-hidden border border-border">
-      <div className="flex items-start gap-2 px-3 py-2 border-b border-border bg-secondary/40">
-        <Plus className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
+    <div className="w-[480px] rounded-xl bg-card text-card-foreground shadow-elevation-3 overflow-hidden border border-border">
+      <div className="flex items-start gap-2 px-4 py-3 border-b border-border bg-secondary/40">
+        <Plus className="w-4 h-4 text-muted-foreground shrink-0 mt-1" />
         <textarea
           value={content}
           onChange={(e) => onContentChange(e.target.value)}
           placeholder="描述任何你想要生成的内容"
-          rows={1}
-          className="flex-1 text-[11px] text-foreground bg-transparent outline-none resize-none placeholder:text-muted-foreground/60 leading-relaxed max-h-20"
+          rows={2}
+          className="flex-1 text-body text-foreground bg-transparent outline-none resize-none placeholder:text-muted-foreground/60 leading-relaxed max-h-24"
         />
       </div>
       <div
         ref={listRef}
-        className="max-h-48 overflow-y-auto px-3 py-2 flex flex-col gap-2 scroll-smooth"
+        className="max-h-64 overflow-y-auto px-4 py-3 flex flex-col gap-3 scroll-smooth"
       >
         {messages.length === 0 && !pending && (
-          <p className="text-[11px] text-muted-foreground/60 text-center py-3">描述内容后按 Enter 发送，与 AI 对话</p>
+          <p className="text-body text-muted-foreground/60 text-center py-4">描述内容后按 Enter 发送，与 AI 对话</p>
         )}
         {messages.map((m) => (
-          <div key={m.id} className={`flex flex-col gap-0.5 text-[11px] ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
-            <span className="text-[9px] uppercase tracking-wider text-muted-foreground/50">{m.role === 'user' ? '你' : 'AI'}</span>
-            <div className={`rounded px-2 py-1 max-w-[95%] whitespace-pre-wrap ${m.role === 'user' ? 'bg-primary/15 text-foreground' : 'bg-secondary text-secondary-foreground'}`}>{m.content}</div>
+          <div key={m.id} className={`flex flex-col gap-1 text-body ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
+            <span className="text-micro uppercase tracking-wider text-muted-foreground/50">{m.role === 'user' ? '你' : 'AI'}</span>
+            <div className={`rounded-lg px-3 py-2 max-w-[95%] whitespace-pre-wrap leading-relaxed ${m.role === 'user' ? 'bg-primary/15 text-foreground' : 'bg-secondary text-secondary-foreground'}`}>{m.content}</div>
           </div>
         ))}
         {pending && (
