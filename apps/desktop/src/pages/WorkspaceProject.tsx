@@ -249,11 +249,8 @@ export default function WorkspaceProject() {
             onNodeClick={handleNodeClick}
             onNodeDoubleClick={handleNodeDoubleClick}
             onPaneClick={handlePaneClick}
-            onNodeDragStart={() => setNodeDragging(true)}
-            onNodeDragStop={(id, pos) => {
-              setNodeDragging(false);
-              handleNodeDragStop(id, pos);
-            }}
+            onNodeDragStart={handleDragStart}
+            onNodeDragStop={handleDragStop}
             onUpdateNode={handleUpdateNode}
             onDraftChange={handleDraftChange}
             onSendChat={handleSendChat}

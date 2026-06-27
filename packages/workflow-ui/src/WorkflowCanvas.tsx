@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import {
   ReactFlow,
   Background,
@@ -52,7 +52,7 @@ export interface WorkflowCanvasProps {
   readOnly?: boolean;
 }
 
-export function WorkflowCanvas({
+export const WorkflowCanvas = memo(function WorkflowCanvas({
   graph,
   activeNodeId,
   activeNodeContent,
@@ -157,7 +157,7 @@ export function WorkflowCanvas({
       </ReactFlow>
     </div>
   );
-}
+});
 
 function NodeEditorWrapper(props: { data: NodeEditorData }) {
   return <NodeEditor {...props.data} />;
