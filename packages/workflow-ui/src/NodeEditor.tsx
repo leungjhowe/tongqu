@@ -31,18 +31,18 @@ function NodeEditorImpl(props: NodeEditorProps) {
       <Handle
         type="target"
         position={Position.Left}
-        className="!w-6 !h-6 !bg-transparent !border-0 !rounded-full"
+        className="!w-10 !h-10 !bg-transparent !border-0 !rounded-full !-left-5 !flex !items-center !justify-center"
       >
-        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-card border border-border text-muted-foreground shadow-elevation-1 hover:text-primary hover:border-primary transition-colors duration-base">
+        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-card border border-border text-muted-foreground shadow-elevation-1 hover:text-primary hover:border-primary transition-colors duration-base pointer-events-none">
           <Plus className="w-3 h-3" />
         </span>
       </Handle>
       <Handle
         type="source"
         position={Position.Right}
-        className="!w-6 !h-6 !bg-transparent !border-0 !rounded-full"
+        className="!w-10 !h-10 !bg-transparent !border-0 !rounded-full !-right-5 !flex !items-center !justify-center"
       >
-        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-card border border-border text-muted-foreground shadow-elevation-1 hover:text-primary hover:border-primary transition-colors duration-base">
+        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-card border border-border text-muted-foreground shadow-elevation-1 hover:text-primary hover:border-primary transition-colors duration-base pointer-events-none">
           <Plus className="w-3 h-3" />
         </span>
       </Handle>

@@ -28,26 +28,40 @@ export default function NodeAttachments({
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
-    // dragging 从 true→false 时强制重新算位置（组件卸载→挂载后位置是旧的）
+    // 订阅 viewport 变化（pan / zoom），实时重算位置
     if (!activeNodeId) {
       setPos(null);
       return;
     }
-    const s: any = storeApi.getState();
-    const allNodes: any[] = s.getNodes?.() ?? [];
-    const node = allNodes.find((n: any) => n.id === activeNodeId);
-    if (!node) return;
 
-    const p = node.position ?? { x: 0, y: 0 };
-    const measured = node.measured ?? {};
-    const w = measured.width ?? 240;
-    const h = measured.height ?? 160;
-    const [tx, ty, zoom] = s.transform as [number, number, number];
+    let raf = 0;
+    const compute = () => {
+      raf = 0;
+      const s: any = storeApi.getState();
+      const allNodes: any[] = s.getNodes?.() ?? [];
+      const node = allNodes.find((n: any) => n.id === activeNodeId);
+      if (!node) return;
+      const p = node.position ?? { x: 0, y: 0 };
+      const measured = node.measured ?? {};
+      const w = measured.width ?? 180;
+      const h = measured.height ?? 180;
+      const [tx, ty, zoom] = s.transform as [number, number, number];
+      setPos({
+        x: (p.x + w / 2) * zoom + tx,
+        y: (p.y + h) * zoom + ty + 12,
+      });
+    };
 
-    setPos({
-      x: (p.x + w / 2) * zoom + tx,
-      y: (p.y + h) * zoom + ty + 12,
-    });
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(compute);
+    };
+
+    compute(); // 首次
+    const unsub = storeApi.subscribe(schedule);
+    return () => {
+      cancelAnimationFrame(raf);
+      unsub();
+    };
   }, [activeNodeId, dragging, storeApi]);
 
   if (!activeNodeId || !pos || dragging) return null;
