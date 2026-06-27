@@ -251,39 +251,36 @@ export default function WorkspaceProject() {
             onUpdateNode={handleUpdateNode}
             onDraftChange={handleDraftChange}
             onSendChat={handleSendChat}
+            attachment={
+              activeNodeId ? (
+                <ChatPanel
+                  content={
+                    (graph.nodes.find((n) => n.id === activeNodeId)
+                      ?.params.content as string | undefined) ?? ''
+                  }
+                  messages={nodeMessages.get(activeNodeId) ?? []}
+                  draft={nodeDrafts.get(activeNodeId) ?? ''}
+                  pending={pendingNodeIds.has(activeNodeId)}
+                  onContentChange={(v) =>
+                    handleUpdateNode(activeNodeId, {
+                      params: {
+                        ...(graph.nodes.find((n) => n.id === activeNodeId)
+                          ?.params ?? {}),
+                        content: v,
+                      },
+                    })
+                  }
+                  onDraftChange={(t) => handleDraftChange(activeNodeId, t)}
+                  onSend={() => {
+                    const text = (
+                      nodeDrafts.get(activeNodeId) ?? ''
+                    ).trim();
+                    if (text) handleSendChat(activeNodeId, text);
+                  }}
+                />
+              ) : undefined
+            }
           />
-          {/* NodeAttachments 系统：集中管理所有吸附（ChatPanel、未来 PropertyPanel 等），
-              拖动节点时通过订阅 store 实时跟随 */}
-          <NodeAttachments activeNodeId={activeNodeId}>
-            {activeNodeId && (
-              <ChatPanel
-                nodeId={activeNodeId}
-                content={
-                  (graph.nodes.find((n) => n.id === activeNodeId)
-                    ?.params.content as string | undefined) ?? ''
-                }
-                messages={nodeMessages.get(activeNodeId) ?? []}
-                draft={nodeDrafts.get(activeNodeId) ?? ''}
-                pending={pendingNodeIds.has(activeNodeId)}
-                onContentChange={(v) =>
-                  handleUpdateNode(activeNodeId, {
-                    params: {
-                      ...(graph.nodes.find((n) => n.id === activeNodeId)
-                        ?.params ?? {}),
-                      content: v,
-                    },
-                  })
-                }
-                onDraftChange={(t) => handleDraftChange(activeNodeId, t)}
-                onSend={() => {
-                  const text = (
-                    nodeDrafts.get(activeNodeId) ?? ''
-                  ).trim();
-                  if (text) handleSendChat(activeNodeId, text);
-                }}
-              />
-            )}
-          </NodeAttachments>
         </div>
       </ReactFlowProvider>
     </main>

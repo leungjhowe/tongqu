@@ -8,6 +8,8 @@ import {
 import 'reactflow/dist/style.css';
 import type { WorkflowGraph, WorkflowNode } from '@tps/workflow-core';
 import NodeEditor from './NodeEditor';
+import NodeAttachments from './NodeAttachments';
+import ChatPanel from './NodeAttachments';
 
 export interface NodeChatMessage {
   id: string;
@@ -43,6 +45,8 @@ export interface WorkflowCanvasProps {
   pendingNodeIds: Set<string>;
   onSendChat: (nodeId: string, text: string) => void;
   onDraftChange?: (nodeId: string, text: string) => void;
+  /** 自定义吸附内容（如 <ChatPanel />），渲染在激活节点下方 */
+  attachment?: React.ReactNode;
   readOnly?: boolean;
 }
 
@@ -60,6 +64,7 @@ export function WorkflowCanvas({
   pendingNodeIds,
   onSendChat,
   onDraftChange,
+  attachment,
   readOnly = false,
 }: WorkflowCanvasProps) {
   const nodes = useMemo(
@@ -139,6 +144,11 @@ export function WorkflowCanvas({
         <Background gap={32} size={1} color="#1f2937" />
         <Controls />
         <MiniMap pannable zoomable />
+        {attachment && activeNodeId && (
+          <NodeAttachments activeNodeId={activeNodeId}>
+            {attachment}
+          </NodeAttachments>
+        )}
       </ReactFlow>
     </div>
   );
