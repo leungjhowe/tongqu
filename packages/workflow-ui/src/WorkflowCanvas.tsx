@@ -143,12 +143,12 @@ export const WorkflowCanvas = memo(function WorkflowCanvas({
         nodes={nodes}
         edges={edges}
         nodesDraggable={!readOnly}
-        nodesConnectable={!readOnly}
         elementsSelectable
         nodeTypes={nodeTypes}
         panOnDrag
         panOnScroll
         selectionOnDrag={false}
+        nodesConnectable={false}
         connectionLineStyle={{ display: 'none' }}
         onNodesChange={(changes) => onNodesChange?.(changes)}
         // onConnect 仅交给 ConnectionOverlay 处理，不传给 ReactFlow
