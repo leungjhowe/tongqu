@@ -151,7 +151,8 @@ export const WorkflowCanvas = memo(function WorkflowCanvas({
         selectionOnDrag={false}
         connectionLineStyle={{ display: 'none' }}
         onNodesChange={(changes) => onNodesChange?.(changes)}
-        onConnect={(c) => onConnect?.(c)}
+        // onConnect 仅交给 ConnectionOverlay 处理，不传给 ReactFlow
+        // 否则 React Flow 会画蓝色连接线干扰
         onNodeClick={(_, n) => onNodeClick?.(n.id)}
         onNodeDoubleClick={(_, n) => onNodeDoubleClick?.(n.id)}
         onPaneClick={() => onPaneClick?.()}

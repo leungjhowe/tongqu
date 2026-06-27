@@ -36,13 +36,15 @@ function NodeEditorImpl(props: NodeEditorProps) {
         const dist = Math.hypot(dx, dy);
 
         if (dist < RELEASE_RANGE) {
-          // 在范围内时：按距离比例偏移，使 handle 中心逐渐对齐鼠标
-          // 比例 = (RELEASE_RANGE - dist) / RELEASE_RANGE
-          const factor = Math.max(0, Math.min(1, (RELEASE_RANGE - dist) / RELEASE_RANGE));
-          // 直接偏移向量（不限制幅值 — 鼠标停正上方时 ox=dx, oy=dy，中心对齐）
-          const ox = dx * factor * 0.6; // 0.6 让跟随略滞后于鼠标
-          const oy = dy * factor * 0.6;
-          el.style.transform = `translate(${ox}px, ${oy}px)`;
+          // 磁吸比例：远→近逐渐增强，<5px 时完全对齐中心
+          let factor = Math.max(0, Math.min(1, (RELEASE_RANGE - dist) / RELEASE_RANGE));
+          let follow = factor * 0.85;
+          if (dist < 5) {
+            // < 5px 完全锁定到鼠标中心
+            el.style.transform = `translate(${dx}px, ${dy}px)`;
+          } else {
+            el.style.transform = `translate(${dx * follow}px, ${dy * follow}px)`;
+          }
           el.style.transition = 'none';
         } else if (el.style.transform !== '') {
           el.style.transform = '';
