@@ -73,8 +73,8 @@ export async function runMigrations(): Promise<void> {
         await client.execute(stmt);
       } catch (e) {
         // 第二次运行时 CREATE TABLE / CREATE UNIQUE INDEX 会报 "already exists"。
-        // 本地开发可忽略，生产环境应改用正规 migration tracker。
-        if (isAlreadyExistsError(e)) throw e;
+        // 本地开发可忽略，其他错误必须抛。
+        if (!isAlreadyExistsError(e)) throw e;
       }
     }
   }
