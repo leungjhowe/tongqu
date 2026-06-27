@@ -89,6 +89,7 @@ export default function ConnectionOverlay({
 
   useEffect(() => {
     const container = containerRef.current;
+    console.log('[conn] useEffect mount, container:', container);
     if (!container) return;
 
     DBG('init', {
@@ -200,6 +201,8 @@ export default function ConnectionOverlay({
   }, [onConnect, containerRef]);
 
   if (!draw) return null;
+
+  console.log('[conn] render ghost', { draw, container: containerRef.current });
 
   return (
     <>

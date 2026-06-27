@@ -12,6 +12,7 @@ import type { WorkflowGraph, WorkflowNode } from '@tps/workflow-core';
 import NodeEditor from './NodeEditor';
 import NodeAttachments from './NodeAttachments';
 import ChatPanel from './NodeAttachments';
+import ConnectionOverlay from './ConnectionOverlay';
 
 export interface NodeChatMessage {
   id: string;
@@ -172,6 +173,13 @@ export const WorkflowCanvas = memo(function WorkflowCanvas({
           <NodeAttachments activeNodeId={activeNodeId} dragging={attachmentDragging}>
             {attachment}
           </NodeAttachments>
+        )}
+        {onConnect && (
+          <ConnectionOverlay
+            nodes={graph.nodes}
+            onConnect={onConnect}
+            containerRef={containerRef}
+          />
         )}
       </ReactFlow>
     </div>
