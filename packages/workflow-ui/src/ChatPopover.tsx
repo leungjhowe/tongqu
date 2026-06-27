@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
+import { useStore } from 'reactflow';
 import { Send, Plus } from 'lucide-react';
 import type { NodeChatMessage } from './WorkflowCanvas';
 
 interface ChatPopoverProps {
-  /** 当前激活节点的 ID（用于显示在上方） */
   nodeId: string;
   content: string;
   messages: NodeChatMessage[];
@@ -14,12 +14,30 @@ interface ChatPopoverProps {
   onSend: () => void;
 }
 
+/** React Flow store selector — 取节点屏幕坐标 */
+const selectorNodePos = (nodeId: string) => (s: any) => {
+  const node = s.nodeLookup?.get(nodeId);
+  const pos = node?.internals?.positionAbsolute;
+  const measured = node?.measured;
+  const t = s.transform as [number, number, number];
+  if (!pos) return null;
+  return {
+    x: pos.x,
+    y: pos.y,
+    width: measured?.width ?? 240,
+    height: measured?.height ?? 160,
+    tx: t[0],
+    ty: t[1],
+    zoom: t[2],
+  };
+};
+
 /**
- * tapNow 风格的 AI 对话浮层 — 固定在画布左下角。
- *
- * 不跟随节点 — 节点本身是静态展示，浮层独立做对话/编辑。
+ * tapNow 风格的 AI 对话浮层 — 跟随节点下方 12px。
+ * 节点本身是静态展示，浮层承担所有交互（编辑 + 对话）。
  */
 export default function ChatPopover({
+  nodeId,
   content,
   messages,
   draft,
@@ -28,6 +46,7 @@ export default function ChatPopover({
   onDraftChange,
   onSend,
 }: ChatPopoverProps) {
+  const pos = useStore(selectorNodePos(nodeId));
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,11 +56,23 @@ export default function ChatPopover({
     });
   }, [messages.length, pending]);
 
+  if (!pos) return null;
+
+  // 节点底部的屏幕坐标
+  const screenX = (pos.x + pos.width / 2) * pos.zoom + pos.tx;
+  const screenY = (pos.y + pos.height) * pos.zoom + pos.ty + 12;
+
   return (
-    /* 固定左下角浮层 — z-floating（最高浮动层） */
-    <div className="absolute bottom-6 left-6 w-[420px] pointer-events-none">
-      <div className="pointer-events-auto rounded-xl bg-card text-card-foreground shadow-elevation-3 overflow-hidden border border-border">
-        {/* 顶部：节点内容预览（可编辑） */}
+    <div
+      className="absolute pointer-events-none"
+      style={{
+        left: 0,
+        top: 0,
+        transform: `translate(${screenX}px, ${screenY}px)`,
+      }}
+    >
+      <div className="pointer-events-auto absolute -translate-x-1/2 w-[360px] rounded-xl bg-card text-card-foreground shadow-elevation-3 overflow-hidden border border-border">
+        {/* 顶部：节点内容编辑（写回 node） */}
         <div className="flex items-start gap-2 px-3 py-2 border-b border-border bg-secondary/40">
           <Plus className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
           <textarea
@@ -121,27 +152,19 @@ export default function ChatPopover({
 
         {/* 底部 model 标识 */}
         <div className="flex items-center justify-between px-3 py-1.5 border-t border-border/40 text-[10px] text-muted-foreground/70">
-          <span>◆ Gemini 3.1 Flash Lite</span>
+          <span>◆ Claude Sonnet</span>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="hover:text-foreground transition-colors"
-              aria-label="语音"
-              title="语音输入"
-            >
-              🎤
-            </button>
-            <button
-              type="button"
-              className="hover:text-foreground transition-colors"
-              aria-label="深度"
-              title="思考深度"
-            >
-              1×
-            </button>
+            <span title="语音">🎤</span>
+            <span title="深度">1×</span>
             <span>⌘1</span>
           </div>
         </div>
+
+        {/* 三角箭头 — 指向节点 */}
+        <div
+          className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-card border-l border-t border-border"
+          aria-hidden
+        />
       </div>
     </div>
   );
