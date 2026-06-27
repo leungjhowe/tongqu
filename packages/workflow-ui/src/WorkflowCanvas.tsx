@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useRef } from 'react';
 import {
   ReactFlow,
   Background,
@@ -134,8 +134,10 @@ export const WorkflowCanvas = memo(function WorkflowCanvas({
     []
   );
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}

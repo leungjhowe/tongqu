@@ -3,3 +3,4 @@ export type { WorkflowCanvasProps, NodeChatMessage, NodeEditorData } from './Wor
 export { default as NodeEditor } from './NodeEditor';
 export { default as NodeAttachments, ChatPanel } from './NodeAttachments';
 export type { NodeAttachmentProps, NodeAttachmentsProps } from './NodeAttachments';
+export { default as ConnectionOverlay } from './ConnectionOverlay';
