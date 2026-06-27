@@ -45,7 +45,7 @@ export interface WorkflowCanvasProps {
   /** 节点变更（React Flow 必要 — 含拖拽过程中的位置更新）。接 applyNodeChanges 后写回 graph */
   onNodesChange?: (changes: NodeChange[]) => void;
   /** 新建连线 — React Flow onConnect 的回调 */
-  onConnect?: (connection: { source: string; target: string; sourceHandle?: string | null; targetHandle?: string | null }) => void;
+  onConnect?: (connection: { source: string | null; target: string | null; sourceHandle?: string | null; targetHandle?: string | null }) => void;
   onUpdateNode?: (nodeId: string, patch: Partial<WorkflowNode>) => void;
   messages: Map<string, NodeChatMessage[]>;
   drafts: Map<string, string>;

@@ -270,7 +270,13 @@ export default function WorkspaceProject() {
                 ...prev,
                 edges: [
                   ...prev.edges,
-                  { id, source: c.source, target: c.target, sourceHandle: c.sourceHandle ?? undefined, targetHandle: c.targetHandle ?? undefined },
+                  {
+                    id,
+                    source: c.source!,
+                    target: c.target!,
+                    sourceHandle: c.sourceHandle ?? undefined,
+                    targetHandle: c.targetHandle ?? undefined,
+                  },
                 ],
               }));
             }}
