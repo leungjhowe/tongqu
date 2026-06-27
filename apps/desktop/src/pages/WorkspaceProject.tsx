@@ -263,6 +263,17 @@ export default function WorkspaceProject() {
               }
             }}
             onNodeDragStop={handleNodeDragStop}
+            onConnect={(c) => {
+              if (!c.source || !c.target || c.source === c.target) return;
+              const id = `edge-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+              setGraph((prev) => ({
+                ...prev,
+                edges: [
+                  ...prev.edges,
+                  { id, source: c.source, target: c.target, sourceHandle: c.sourceHandle ?? undefined, targetHandle: c.targetHandle ?? undefined },
+                ],
+              }));
+            }}
             attachmentDragging={nodeDragging}
             onUpdateNode={handleUpdateNode}
             onDraftChange={handleDraftChange}

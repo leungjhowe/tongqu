@@ -44,6 +44,8 @@ export interface WorkflowCanvasProps {
   onNodeDragStop?: (nodeId: string, position: { x: number; y: number }) => void;
   /** 节点变更（React Flow 必要 — 含拖拽过程中的位置更新）。接 applyNodeChanges 后写回 graph */
   onNodesChange?: (changes: NodeChange[]) => void;
+  /** 新建连线 — React Flow onConnect 的回调 */
+  onConnect?: (connection: { source: string; target: string; sourceHandle?: string | null; targetHandle?: string | null }) => void;
   onUpdateNode?: (nodeId: string, patch: Partial<WorkflowNode>) => void;
   messages: Map<string, NodeChatMessage[]>;
   drafts: Map<string, string>;
@@ -66,6 +68,7 @@ export const WorkflowCanvas = memo(function WorkflowCanvas({
   onNodeDragStart,
   onNodeDragStop,
   onNodesChange,
+  onConnect,
   onUpdateNode,
   messages,
   drafts,
@@ -144,6 +147,7 @@ export const WorkflowCanvas = memo(function WorkflowCanvas({
         panOnScroll
         selectionOnDrag
         onNodesChange={(changes) => onNodesChange?.(changes)}
+        onConnect={(c) => onConnect?.(c)}
         onNodeClick={(_, n) => onNodeClick?.(n.id)}
         onNodeDoubleClick={(_, n) => onNodeDoubleClick?.(n.id)}
         onPaneClick={() => onPaneClick?.()}
