@@ -21,14 +21,14 @@ export interface NodeAttachmentProps {
 export interface NodeAttachmentsProps {
   activeNodeId: string | null;
   /** 当前激活节点上要显示的所有吸附（通常是 [ChatPanel]） */
-  attachments: React.ReactNode;
+  children?: React.ReactNode;
   /** 容器宽度 — 让 absolute 定位的吸附相对此容器 */
   className?: string;
 }
 
 export default function NodeAttachments({
   activeNodeId,
-  attachments,
+  children,
   className = '',
 }: NodeAttachmentsProps) {
   const rf = useReactFlow();
@@ -85,7 +85,7 @@ export default function NodeAttachments({
       >
         {/* 切节点时旧组件立刻卸载，新组件挂载 + 动画 */}
         <div className="node-attachment-anim pointer-events-auto">
-          {attachments}
+          {children}
         </div>
       </div>
     </div>
