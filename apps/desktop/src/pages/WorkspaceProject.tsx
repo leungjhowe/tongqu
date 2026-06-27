@@ -25,7 +25,10 @@ export default function WorkspaceProject() {
   const [graph, setGraph] = useState<WorkflowGraph>(EMPTY_GRAPH);
   // 双击激活的节点（编辑器展开）
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
-  // 拖动中标识 — 预留；当前先关闭以避免 state 变化触发 ReactFlow 重渲染破坏拖拽
+  // 拖动中标识 — 隐藏吸附浮层
+  const [nodeDragging, setNodeDragging] = useState(false);
+  const handleDragStart = useCallback(() => setNodeDragging(true), []);
+
   const [nodeMessages, setNodeMessages] = useState<Map<string, NodeChatMessage[]>>(
     () => new Map()
   );
@@ -113,9 +116,10 @@ export default function WorkspaceProject() {
     setActiveNodeId(null);
   }, []);
 
-  /** 节点拖动结束：保存新位置 */
+  /** 节点拖动结束：保存新位置 + 显示吸附 */
   const handleNodeDragStop = useCallback(
     (nodeId: string, position: { x: number; y: number }) => {
+      setNodeDragging(false);
       handleUpdateNode(nodeId, { position });
     },
     [handleUpdateNode]
