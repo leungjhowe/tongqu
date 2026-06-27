@@ -237,14 +237,15 @@ export default function ConnectionOverlay({
         </div>
       )}
 
-      <svg className="pointer-events-none fixed inset-0 z-floating" width="100%" height="100%">
+      <svg className="pointer-events-none fixed inset-0 z-[99]" width="100%" height="100%">
         <line
           x1={draw.from.x}
           y1={draw.from.y}
           x2={draw.snap ? draw.snap.x : draw.cursor.x}
           y2={draw.snap ? draw.snap.y : draw.cursor.y}
-          stroke="hsl(217 91% 60%)"
-          strokeWidth={2}
+          stroke="hsla(217 91% 60% / 0.2)"
+          strokeWidth={1.5}
+          strokeDasharray="4 3"
         />
       </svg>
     </>

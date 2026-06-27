@@ -55,11 +55,34 @@ test.describe("Handle 视觉 + 磁吸", () => {
       await page.waitForTimeout(200);
       await page.screenshot({ path: "e2e/screenshots/handle-hover-center.png" });
 
-      // 鼠标偏移5px，看 handle 是否跟随
-      await page.mouse.move(box.x + box.width / 2 + 10, box.y + box.height / 2);
+      // 鼠标偏移 20px，验证 handle 跟随（transform）
+      await page.mouse.move(box.x + box.width / 2 + 20, box.y + box.height / 2);
       await page.waitForTimeout(100);
-      // 再截图
-      await page.screenshot({ path: "e2e/screenshots/handle-moved-10px.png" });
+      await page.screenshot({ path: "e2e/screenshots/handle-moved-20px.png" });
+
+      // 读取 handle transform
+      const transform = await sourceHandle.evaluate((el) =>
+        getComputedStyle(el).transform
+      );
+      console.log(`  磁吸 transform (offset 20px right): ${transform}`);
+
+      // 鼠标回到 handle 正中心 → 应完全对齐（transform = 接近 matrix(1,0,0,1,0,0)）
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.waitForTimeout(200);
+      await page.screenshot({ path: "e2e/screenshots/handle-back-to-center.png" });
+      const transformCenter = await sourceHandle.evaluate((el) =>
+        getComputedStyle(el).transform
+      );
+      console.log(`  回到中心 transform: ${transformCenter}`);
+
+      // 鼠标移远（>RELEASE_RANGE），应归位
+      await page.mouse.move(box.x + 100, box.y + box.height / 2);
+      await page.waitForTimeout(300);
+      await page.screenshot({ path: "e2e/screenshots/handle-far.png" });
+      const transformFar = await sourceHandle.evaluate((el) =>
+        getComputedStyle(el).transform
+      );
+      console.log(`  远离 transform: ${transformFar}`);
     }
   });
 });
