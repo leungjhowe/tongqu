@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { useStore } from 'reactflow';
+import { useEffect, useRef, useState } from 'react';
+import { useStoreApi } from 'reactflow';
 import { Send, Plus } from 'lucide-react';
 import type { NodeChatMessage } from './WorkflowCanvas';
 
@@ -14,31 +14,21 @@ interface ChatPopoverProps {
   onSend: () => void;
 }
 
-/** React Flow store selector — 节点屏幕坐标 */
-const selectorNodePos = (s: any, nodeId: string) => {
-  const node = s.nodeLookup?.get(nodeId);
-  const pos = node?.internals?.positionAbsolute;
-  const measured = node?.measured;
-  const t = s.transform as [number, number, number];
-  if (!pos) return null;
-  return {
-    x: pos.x,
-    y: pos.y,
-    width: measured?.width ?? 240,
-    height: measured?.height ?? 160,
-    tx: t[0],
-    ty: t[1],
-    zoom: t[2],
-  };
-};
+interface NodePos {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  tx: number;
+  ty: number;
+  zoom: number;
+}
 
 /**
  * tapNow 风格的 AI 对话浮层 — 跟随节点下方 12px。
  *
- * 通过 useReactFlow().getViewport() 拿到 viewport transform，
- * 直接在 React Flow 父容器内绝对定位。
- *
- * 使用 useStore 监听 viewport 变化（拖动 / 缩放）实时跟随。
+ * 用 useStoreApi 直接订阅 React Flow store（不依赖 useStore 的
+ * shallow equality 行为），每次 store 变化 forceUpdate。
  */
 export default function ChatPopover({
   nodeId,
@@ -50,10 +40,37 @@ export default function ChatPopover({
   onDraftChange,
   onSend,
 }: ChatPopoverProps) {
-  // 用单一 selector 函数（不带 nodeId 参数），用闭包注入 nodeId
-  // React Flow 11 useStore 要求 selector 引用稳定
-  const pos = useStore((s) => selectorNodePos(s, nodeId));
+  const store = useStoreApi();
+  const [pos, setPos] = useState<NodePos | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const force = useState(0)[1]; // 没用，备用
+
+  useEffect(() => {
+    const updatePos = () => {
+      const s: any = store.getState();
+      const node = s.nodeLookup?.get(nodeId);
+      const absPos = node?.internals?.positionAbsolute;
+      const measured = node?.measured;
+      const t = s.transform as [number, number, number];
+      if (!absPos) {
+        setPos(null);
+        return;
+      }
+      setPos({
+        x: absPos.x,
+        y: absPos.y,
+        width: measured?.width ?? 240,
+        height: measured?.height ?? 160,
+        tx: t[0],
+        ty: t[1],
+        zoom: t[2],
+      });
+    };
+
+    updatePos();
+    const unsubscribe = store.subscribe(updatePos);
+    return () => unsubscribe();
+  }, [nodeId, store]);
 
   useEffect(() => {
     listRef.current?.scrollTo({
@@ -68,12 +85,11 @@ export default function ChatPopover({
         className="absolute pointer-events-none border-2 border-red-500 bg-red-500/30 p-1 text-[10px] text-red-500"
         style={{ left: 0, top: 0 }}
       >
-        CHAT POPOVER: pos is null (node not in store) — nodeId={nodeId}
+        CP-debug: pos=null, nodeId={nodeId}
       </div>
     );
   }
 
-  // flow 坐标 + viewport transform → 父容器内 px
   const screenX = (pos.x + pos.width / 2) * pos.zoom + pos.tx;
   const screenY = (pos.y + pos.height) * pos.zoom + pos.ty + 12;
 
@@ -83,7 +99,7 @@ export default function ChatPopover({
         className="absolute pointer-events-none border-2 border-yellow-500 bg-yellow-500/20 p-1 text-[10px] text-yellow-300"
         style={{ left: 0, top: 0 }}
       >
-        CP @ {Math.round(screenX)},{Math.round(screenY)} z={pos.zoom.toFixed(2)}
+        CP @{Math.round(screenX)},{Math.round(screenY)} z={pos.zoom.toFixed(2)} node={nodeId}
       </div>
       <div
         className="absolute pointer-events-none"
