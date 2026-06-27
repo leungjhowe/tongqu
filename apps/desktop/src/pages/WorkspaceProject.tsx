@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom";
 import { ReactFlowProvider } from "reactflow";
 import {
   WorkflowCanvas,
-  ChatPopover,
+  NodeAttachments,
+  ChatPanel,
   type NodeChatMessage,
 } from "@tps/workflow-ui";
 import { getProjectById, touchProject, type Project } from "@tps/data-core";
@@ -233,7 +234,7 @@ export default function WorkspaceProject() {
         <WorkflowToolbar onAddNode={handleAddNode} />
       </div>
 
-      {/* 一个 ReactFlowProvider 包住主画布 + ChatPopover，
+      {/* 一个 ReactFlowProvider 包住主画布 + NodeAttachments，
           两者共享同一份 store（getNode / getViewport 才能拿到画布状态） */}
       <ReactFlowProvider>
         <div className="flex-1 min-h-0 relative">
@@ -251,35 +252,38 @@ export default function WorkspaceProject() {
             onDraftChange={handleDraftChange}
             onSendChat={handleSendChat}
           />
-          {activeNodeId && (
-            <ChatPopover
-              nodeId={activeNodeId}
-              content={
-                (graph.nodes
-                  .find((n) => n.id === activeNodeId)
-                  ?.params.content as string | undefined) ?? ''
-              }
-              messages={nodeMessages.get(activeNodeId) ?? []}
-              draft={nodeDrafts.get(activeNodeId) ?? ''}
-              pending={pendingNodeIds.has(activeNodeId)}
-              onContentChange={(v) =>
-                handleUpdateNode(activeNodeId, {
-                  params: {
-                    ...(graph.nodes.find((n) => n.id === activeNodeId)
-                      ?.params ?? {}),
-                    content: v,
-                  },
-                })
-              }
-              onDraftChange={(t) => handleDraftChange(activeNodeId, t)}
-              onSend={() => {
-                const text = (
-                  nodeDrafts.get(activeNodeId) ?? ''
-                ).trim();
-                if (text) handleSendChat(activeNodeId, text);
-              }}
-            />
-          )}
+          {/* NodeAttachments 系统：集中管理所有吸附（ChatPanel、未来 PropertyPanel 等），
+              拖动节点时通过订阅 store 实时跟随 */}
+          <NodeAttachments activeNodeId={activeNodeId}>
+            {activeNodeId && (
+              <ChatPanel
+                nodeId={activeNodeId}
+                content={
+                  (graph.nodes.find((n) => n.id === activeNodeId)
+                    ?.params.content as string | undefined) ?? ''
+                }
+                messages={nodeMessages.get(activeNodeId) ?? []}
+                draft={nodeDrafts.get(activeNodeId) ?? ''}
+                pending={pendingNodeIds.has(activeNodeId)}
+                onContentChange={(v) =>
+                  handleUpdateNode(activeNodeId, {
+                    params: {
+                      ...(graph.nodes.find((n) => n.id === activeNodeId)
+                        ?.params ?? {}),
+                      content: v,
+                    },
+                  })
+                }
+                onDraftChange={(t) => handleDraftChange(activeNodeId, t)}
+                onSend={() => {
+                  const text = (
+                    nodeDrafts.get(activeNodeId) ?? ''
+                  ).trim();
+                  if (text) handleSendChat(activeNodeId, text);
+                }}
+              />
+            )}
+          </NodeAttachments>
         </div>
       </ReactFlowProvider>
     </main>

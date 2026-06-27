@@ -126,6 +126,10 @@ export function WorkflowCanvas({
         nodesConnectable={!readOnly}
         elementsSelectable
         nodeTypes={nodeTypes}
+        // 只在空白面板上允许 pan — 避免节点拖动被误识别为 pan
+        panOnDrag={[1, 2]} // 仅中键 / 右键拖动画布
+        panOnScroll
+        selectionOnDrag={false}
         onNodeClick={(_, n) => onNodeClick?.(n.id)}
         onNodeDoubleClick={(_, n) => onNodeDoubleClick?.(n.id)}
         onPaneClick={() => onPaneClick?.()}

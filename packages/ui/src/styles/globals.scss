@@ -91,8 +91,8 @@ a {
   }
 }
 
-/* ChatPopover 弹出动效 — fade + slide down from node */
-@keyframes chat-popover-in {
+/* NodeAttachments 弹出动效 — fade + slide down from node */
+@keyframes node-attachment-in {
   from {
     opacity: 0;
     transform: translate(-50%, -8px);
@@ -102,6 +102,6 @@ a {
     transform: translate(-50%, 0);
   }
 }
-.chat-popover-anim {
-  animation: chat-popover-in 200ms cubic-bezier(0.2, 0, 0, 1);
+.node-attachment-anim {
+  animation: node-attachment-in 200ms cubic-bezier(0.2, 0, 0, 1);
 }
