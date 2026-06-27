@@ -33,7 +33,7 @@ function NodeEditorImpl(props: NodeEditorProps) {
         position={Position.Left}
         className="!w-10 !h-10 !bg-transparent !border-0 !rounded-full !-left-[34px] !flex !items-center !justify-center"
       >
-        <span className="flex items-center justify-center w-9 h-9 rounded-full bg-card/80 backdrop-blur border-2 border-foreground/50 text-foreground/80 shadow-elevation-2 hover:border-primary hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none">
+        <span className="flex items-center justify-center w-9 h-9 rounded-full bg-transparent border-2 border-foreground/60 text-foreground/70 hover:border-primary hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none">
           <Plus className="w-4 h-4" />
         </span>
       </Handle>
@@ -42,7 +42,7 @@ function NodeEditorImpl(props: NodeEditorProps) {
         position={Position.Right}
         className="!w-10 !h-10 !bg-transparent !border-0 !rounded-full !-right-[34px] !flex !items-center !justify-center"
       >
-        <span className="flex items-center justify-center w-9 h-9 rounded-full bg-card/80 backdrop-blur border-2 border-foreground/50 text-foreground/80 shadow-elevation-2 hover:border-primary hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none">
+        <span className="flex items-center justify-center w-9 h-9 rounded-full bg-transparent border-2 border-foreground/60 text-foreground/70 hover:border-primary hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none">
           <Plus className="w-4 h-4" />
         </span>
       </Handle>
