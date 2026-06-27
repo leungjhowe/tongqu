@@ -158,11 +158,8 @@ export default function ConnectionOverlay({
     const onPointerMove = (e: PointerEvent) => {
       const d = drawRef.current;
       if (!d) return;
-      const containerRect = container.getBoundingClientRect();
-      // 容器坐标用于 distance 计算（与 computeHandles 一致）
-      const cursor = { x: e.clientX - containerRect.left, y: e.clientY - containerRect.top };
-      // 视口坐标用于 ghost 渲染（position: fixed）
-      const viewportCursor = { x: e.clientX, y: e.clientY };
+      // 全部用视口坐标（与 computeHandles 一致）
+      const vp = { x: e.clientX, y: e.clientY };
 
       if (rafRef.current) return;
       rafRef.current = requestAnimationFrame(() => {
@@ -170,9 +167,9 @@ export default function ConnectionOverlay({
         const cur = drawRef.current;
         if (!cur) return;
         const handles = computeHandles();
-        const snap = findSnap(cursor, handles, cur.from);
-        DBG('move', { cursor, snap: snap ?? null });
-        setDraw({ ...cur, cursor: viewportCursor, snap: snap ?? undefined });
+        const snap = findSnap(vp, handles, cur.from);
+        DBG('move', { vp, snap: snap ?? null });
+        setDraw({ ...cur, cursor: vp, snap: snap ?? undefined });
       });
     };
 
