@@ -136,7 +136,7 @@ export function WorkflowCanvas({
         <Background gap={32} size={1} color="#1f2937" />
         <Controls />
         <MiniMap pannable zoomable />
-        {/* Chat 浮层 — 跟随 active 节点位置 */}
+        {/* Chat 浮层 — tapNow 风格，固定左下角 */}
         {activeNodeId && (
           <ChatPopover
             nodeId={activeNodeId}
@@ -144,6 +144,15 @@ export function WorkflowCanvas({
             messages={messages.get(activeNodeId) ?? []}
             draft={drafts.get(activeNodeId) ?? ''}
             pending={pendingNodeIds.has(activeNodeId)}
+            onContentChange={(v) => {
+              // 编辑节点 content 写回 params.content
+              const n = graph.nodes.find((nn) => nn.id === activeNodeId);
+              if (n) {
+                onUpdateNode?.(n.id, {
+                  params: { ...n.params, content: v },
+                });
+              }
+            }}
             onDraftChange={(t) => onDraftChange?.(activeNodeId, t)}
             onSend={() => {
               const text = (drafts.get(activeNodeId) ?? '').trim();
