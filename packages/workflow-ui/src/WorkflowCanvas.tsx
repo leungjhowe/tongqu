@@ -60,7 +60,7 @@ export function WorkflowCanvas({
   pendingNodeIds,
   onSendChat,
   onDraftChange,
-  readOnly = true,
+  readOnly = false,
 }: WorkflowCanvasProps) {
   const nodes = useMemo(
     () =>

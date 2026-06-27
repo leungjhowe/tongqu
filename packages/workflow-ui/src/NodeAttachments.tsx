@@ -82,20 +82,18 @@ export default function NodeAttachments({
         zIndex: 100,
       }}
     >
-      {/* 单一容器：让 React 只挂载一份，避免切换节点的多次 unmount */}
+      {/* 单一容器 — 使用 CSS transition 实现 in/out（而非 key remount） */}
       <div
-        key={activeNodeId}
-        className="absolute"
+        className={`absolute node-attachment-anim pointer-events-auto ${
+          children ? 'node-attachment-visible' : ''
+        }`}
         style={{
           left: '50%',
           top: 0,
           transform: 'translate(-50%, 0)',
         }}
       >
-        {/* 切节点时旧组件立刻卸载，新组件挂载 + 动画 */}
-        <div className="node-attachment-anim pointer-events-auto">
-          {children}
-        </div>
+        {children}
       </div>
     </div>
   );

@@ -91,17 +91,18 @@ a {
   }
 }
 
-/* NodeAttachments 弹出动效 — fade + slide down from node */
-@keyframes node-attachment-in {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -8px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
+/* NodeAttachments 弹出动效 — fade + slide down
+   用 opacity / transform transition，in/out 都平滑 */
 .node-attachment-anim {
-  animation: node-attachment-in 200ms cubic-bezier(0.2, 0, 0, 1);
+  opacity: 0;
+  transform: translate(-50%, -8px);
+  transition:
+    opacity 180ms cubic-bezier(0.2, 0, 0, 1),
+    transform 180ms cubic-bezier(0.2, 0, 0, 1);
+  pointer-events: none;
+}
+.node-attachment-anim.node-attachment-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
 }
