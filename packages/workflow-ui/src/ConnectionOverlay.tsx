@@ -37,8 +37,8 @@ interface ConnectionOverlayProps {
   containerRef: React.RefObject<HTMLElement>;
 }
 
-const SNAP_THRESHOLD = 40; // ghost 中心距另一端口的吸附阈值
-const START_THRESHOLD = 30; // pointerdown 起点距端口的触发阈值
+const SNAP_THRESHOLD = 50; // ghost 中心距另一端口的吸附阈值
+const START_THRESHOLD = 50; // pointerdown 起点距端口的触发阈值
 
 export default function ConnectionOverlay({
   nodes,
@@ -127,6 +127,7 @@ export default function ConnectionOverlay({
       if (e.button !== 0) return;
       const handles = computeHandles();
       const hit = findHit(e.clientX, e.clientY, handles);
+      console.log('[connect-debug] pointerdown', { client: [e.clientX, e.clientY], handles: handles.length, hit: hit?.nodeId });
       if (!hit) return;
       e.preventDefault();
       const rect = container.getBoundingClientRect();
