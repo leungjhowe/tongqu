@@ -92,17 +92,20 @@ a {
 }
 
 /* NodeAttachments 弹出动效 — fade + slide down
-   用 opacity / transform transition，in/out 都平滑 */
+   用 @keyframes animation，每次 mount 都播放 */
 .node-attachment-anim {
-  opacity: 0;
-  transform: translate(-50%, -8px);
-  transition:
-    opacity 180ms cubic-bezier(0.2, 0, 0, 1),
-    transform 180ms cubic-bezier(0.2, 0, 0, 1);
-  pointer-events: none;
+  /* 过渡等待：初始不可见 */
 }
 .node-attachment-anim.node-attachment-visible {
-  opacity: 1;
-  transform: translate(-50%, 0);
-  pointer-events: auto;
+  animation: node-attachment-in 180ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+@keyframes node-attachment-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

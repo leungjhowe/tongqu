@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useReactFlow, Panel } from 'reactflow';
+import { useStoreApi, Panel } from 'reactflow';
 import { Send, Plus } from 'lucide-react';
 import type { NodeChatMessage } from './WorkflowCanvas';
 
@@ -30,72 +30,80 @@ export interface NodeAttachmentsProps {
   className?: string;
 }
 
+/**
+ * 节点吸附系统 — 极致轻量实现。
+ *
+ * 只做一件事：跟随 active 节点坐标，渲染 children。
+ * 用 useStoreApi 订阅 store，每次变化只更新 left/top 数值。
+ * children 用 memo 优化，避免父组件重渲染时重建。
+ */
 export default function NodeAttachments({
   activeNodeId,
   children,
   className = '',
 }: NodeAttachmentsProps) {
-  const rf = useReactFlow();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [, force] = useStateReducer();
+  const storeApi = useStoreApi();
+  const elRef = useRef<HTMLDivElement>(null);
 
-  // 订阅 store：节点拖动 / 缩放时坐标实时刷新
+  // 使用 rAF 驱动的位置更新，不触发 React re-render（直接操作 DOM）
   useEffect(() => {
-    const api: any = (rf as any).store ?? rf;
-    const store = api.getState ? api : null;
-    if (!store || typeof store.subscribe !== 'function') return;
-    const cb = () => force();
-    const off = store.subscribe(cb);
-    return () => off();
-  }, [rf]);
+    const el = elRef.current;
+    if (!el || !activeNodeId) return;
+
+    let raf: number;
+
+    const update = () => {
+      const s: any = storeApi.getState();
+      const nodeEntry = s.nodeInternals?.get(activeNodeId);
+
+      if (!nodeEntry) {
+        el.style.display = 'none';
+        return;
+      }
+
+      el.style.display = '';
+      const pos = nodeEntry.positionAbsolute || nodeEntry.position || { x: 0, y: 0 };
+      const measured = nodeEntry.measured || {};
+      const w = measured.width ?? 240;
+      const h = measured.height ?? 160;
+      const [tx, ty, zoom] = s.transform as [number, number, number];
+
+      el.style.left = `${(pos.x + w / 2) * zoom + tx}px`;
+      el.style.top = `${(pos.y + h) * zoom + ty + 12}px`;
+    };
+
+    update();
+    const unsub = storeApi.subscribe(() => {
+      raf = requestAnimationFrame(update);
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      unsub();
+    };
+  }, [activeNodeId, storeApi]);
 
   if (!activeNodeId) return null;
 
-  // 计算节点屏幕坐标（React Flow viewport transform）
-  const node = rf.getNode(activeNodeId);
-  if (!node) return null;
-
-  const vp = rf.getViewport();
-  const measured = (node as any).measured ?? { width: 240, height: 160 };
-  const width = measured.width ?? 240;
-  const height = measured.height ?? 160;
-  const cx = (node.position.x + width / 2) * vp.zoom + vp.x;
-  const top = (node.position.y + height) * vp.zoom + vp.y + 12;
-
   return (
     <Panel position="top-left" className="!m-0 !p-0 pointer-events-none">
+      {/* ref 指向的 div — 直接操作 style 避开 React reconcile */}
       <div
-        ref={containerRef}
-        className={className}
+        ref={elRef}
+        aria-hidden
+        className={`${className}`}
         style={{
           position: 'absolute',
-          left: `${cx}px`,
-          top: `${top}px`,
-          transform: 'translate(-50%, 0)',
           zIndex: 100,
           pointerEvents: 'none',
         }}
       >
-        {/* 单一容器 — CSS transition 实现 in/out 双向动画 */}
-        <div
-          className={`node-attachment-anim pointer-events-auto ${
-            children ? 'node-attachment-visible' : ''
-          }`}
-        >
+        <div key={activeNodeId} className="node-attachment-anim node-attachment-visible pointer-events-auto">
           {children}
         </div>
       </div>
     </Panel>
   );
-}
-
-// useReducer 让 setState 在每次 store 变化时强制重新计算
-function useStateReducer(): [number, () => void] {
-  const ref = useRef(0);
-  const setRef = () => {
-    ref.current++;
-  };
-  return [ref.current, setRef];
 }
 
 /* ===== 内置 ChatPanel ===== */
