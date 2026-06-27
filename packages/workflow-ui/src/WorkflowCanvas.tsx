@@ -135,15 +135,25 @@ export const WorkflowCanvas = memo(function WorkflowCanvas({
         nodesConnectable={!readOnly}
         elementsSelectable
         nodeTypes={nodeTypes}
-        // 只在空白面板上允许 pan — 避免节点拖动被误识别为 pan
-        panOnDrag={[1, 2]} // 仅中键 / 右键拖动画布
+        // 暂时清除所有 pan 限制 — 使用 React Flow 默认值
+        panOnDrag
         panOnScroll
-        selectionOnDrag={false}
+        selectionOnDrag
         onNodeClick={(_, n) => onNodeClick?.(n.id)}
         onNodeDoubleClick={(_, n) => onNodeDoubleClick?.(n.id)}
         onPaneClick={() => onPaneClick?.()}
-        onNodeDragStart={(_, n) => onNodeDragStart?.(n.id)}
-        onNodeDragStop={(_, n) => onNodeDragStop?.(n.id, n.position)}
+        onNodeDragStart={(_, n) => {
+          console.log('[drag-debug] dragStart', n.id, n.position);
+          onNodeDragStart?.(n.id);
+        }}
+        onNodeDrag={(_, n) => {
+          // 拖拽时每帧打印节点位置（确认鼠标跟随）
+          console.log('[drag-debug] drag', n.id, 'pos', n.position);
+        }}
+        onNodeDragStop={(_, n) => {
+          console.log('[drag-debug] dragStop', n.id, n.position);
+          onNodeDragStop?.(n.id, n.position);
+        }}
         fitView
       >
         <Background gap={32} size={1} color="#1f2937" />
