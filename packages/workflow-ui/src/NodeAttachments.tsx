@@ -67,20 +67,29 @@ export default function NodeAttachments({
   const top = (node.position.y + height) * vp.zoom + vp.y + 12;
 
   return (
+    // 用一个紧凑的容器覆盖节点下方的区域（不覆盖整个画布），
+    // 不影响 React Flow 节点的拖拽 / 选中事件
     <div
       ref={containerRef}
-      className={`pointer-events-none ${className}`}
-      style={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0 }}
+      className={className}
+      style={{
+        position: 'absolute',
+        left: `${cx - 200}px`,
+        top: `${top}px`,
+        width: '400px',
+        height: '400px',
+        pointerEvents: 'none',
+        zIndex: 100,
+      }}
     >
       {/* 单一容器：让 React 只挂载一份，避免切换节点的多次 unmount */}
       <div
         key={activeNodeId}
         className="absolute"
         style={{
-          left: `${cx}px`,
-          top: `${top}px`,
+          left: '50%',
+          top: 0,
           transform: 'translate(-50%, 0)',
-          zIndex: 100,
         }}
       >
         {/* 切节点时旧组件立刻卸载，新组件挂载 + 动画 */}

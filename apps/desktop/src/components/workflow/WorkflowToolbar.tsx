@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import { Plus, Search, Archive, Layout, History, Type } from "lucide-react";
 import type { WorkflowNode } from "@tps/workflow-core";
 
@@ -17,7 +18,8 @@ interface WorkflowToolbarProps {
   onAddNode: (type: WorkflowNode["type"]) => void;
 }
 
-/** 左侧胶囊工具栏单项 */
+/** 左侧胶囊工具栏单项 — 用 onMouseEnter/Leave + close delay，
+ *  避免鼠标从按钮移到 flyout 时 flyout 闪烁消失 */
 function ToolItem({
   icon: Icon,
   label,
@@ -27,8 +29,36 @@ function ToolItem({
   label: string;
   children?: React.ReactNode;
 }) {
+  const [open, setOpen] = useState(false);
+  const closeTimer = useRef<number | null>(null);
+
+  // 关闭时给 150ms 缓冲，让鼠标有时间从按钮滑到 flyout
+  const onEnter = () => {
+    if (closeTimer.current) {
+      window.clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+    setOpen(true);
+  };
+  const onLeave = () => {
+    closeTimer.current = window.setTimeout(() => {
+      setOpen(false);
+      closeTimer.current = null;
+    }, 150);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    };
+  }, []);
+
   return (
-    <div className="group relative flex items-center justify-center">
+    <div
+      className="relative flex items-center justify-center"
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+    >
       <button
         type="button"
         title={label}
@@ -36,15 +66,24 @@ function ToolItem({
       >
         <Icon className="w-3.5 h-3.5" />
       </button>
+
       {/* 标签 — 悬停时在右侧显示 */}
-      <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 hidden group-hover:block pointer-events-none z-tooltip">
-        <span className="whitespace-nowrap px-2 py-1 rounded text-caption bg-popover text-popover-foreground border border-border shadow-elevation-2">
-          {label}
-        </span>
-      </div>
+      {open && !children && (
+        <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 pointer-events-none z-tooltip">
+          <span className="whitespace-nowrap px-2 py-1 rounded text-caption bg-popover text-popover-foreground border border-border shadow-elevation-2">
+            {label}
+          </span>
+        </div>
+      )}
+
       {/* 子元素（flyout）— 有 children 时在右侧展开 */}
-      {children && (
-        <div className="absolute left-full ml-2 top-0 hidden group-hover:block z-floating">
+      {children && open && (
+        <div
+          className="absolute left-full ml-2 top-0 z-floating"
+          // 让 flyout 自身也参与 enter/leave（否则移上去会关闭）
+          onMouseEnter={onEnter}
+          onMouseLeave={onLeave}
+        >
           {children}
         </div>
       )}
