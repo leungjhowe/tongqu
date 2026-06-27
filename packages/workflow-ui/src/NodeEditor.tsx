@@ -8,7 +8,8 @@ interface NodeEditorProps extends NodeEditorData {
 }
 
 const ATTRACT_RANGE = 50; // px — 鼠标进入此范围后 handle 开始跟随
-const MAX_OFFSET = 12; // px — handle 最大偏移量
+const RELEASE_RANGE = 55; // px — 鼠标超出此范围后归位（>ATTRACT_RANGE 防抖动）
+const MAX_OFFSET = 6; // px — handle 最大偏移量（够了，目标是中心对齐）
 
 /**
  * 文本节点 — tapNow 风格。
@@ -33,11 +34,14 @@ function NodeEditorImpl(props: NodeEditorProps) {
         const dx = e.clientX - cx;
         const dy = e.clientY - cy;
         const dist = Math.hypot(dx, dy);
-        if (dist < ATTRACT_RANGE) {
-          // 按距离比例偏移，最大 MAX_OFFSET
-          const factor = Math.min(1, (ATTRACT_RANGE - dist) / ATTRACT_RANGE);
-          const ox = dx * factor * (MAX_OFFSET / Math.max(dist, 1));
-          const oy = dy * factor * (MAX_OFFSET / Math.max(dist, 1));
+
+        if (dist < RELEASE_RANGE) {
+          // 在范围内时：按距离比例偏移，使 handle 中心逐渐对齐鼠标
+          // 比例 = (RELEASE_RANGE - dist) / RELEASE_RANGE
+          const factor = Math.max(0, Math.min(1, (RELEASE_RANGE - dist) / RELEASE_RANGE));
+          // 直接偏移向量（不限制幅值 — 鼠标停正上方时 ox=dx, oy=dy，中心对齐）
+          const ox = dx * factor * 0.6; // 0.6 让跟随略滞后于鼠标
+          const oy = dy * factor * 0.6;
           el.style.transform = `translate(${ox}px, ${oy}px)`;
           el.style.transition = 'none';
         } else if (el.style.transform !== '') {
@@ -72,7 +76,7 @@ function NodeEditorImpl(props: NodeEditorProps) {
       >
         <span
           ref={targetRef}
-          className="flex items-center justify-center w-9 h-9 rounded-full bg-transparent border-2 border-foreground/60 text-foreground/70 hover:border-primary hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none"
+          className="flex items-center justify-center w-9 h-9 rounded-full bg-transparent border-2 border-foreground/90 text-foreground/80 hover:border-primary hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none"
         >
           <Plus className="w-4 h-4" />
         </span>
@@ -84,7 +88,7 @@ function NodeEditorImpl(props: NodeEditorProps) {
       >
         <span
           ref={sourceRef}
-          className="flex items-center justify-center w-9 h-9 rounded-full bg-transparent border-2 border-foreground/60 text-foreground/70 hover:border-primary hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none"
+          className="flex items-center justify-center w-9 h-9 rounded-full bg-transparent border-2 border-foreground/90 text-foreground/80 hover:border-primary hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none"
         >
           <Plus className="w-4 h-4" />
         </span>

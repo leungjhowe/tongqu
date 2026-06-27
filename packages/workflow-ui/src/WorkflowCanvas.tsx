@@ -148,7 +148,8 @@ export const WorkflowCanvas = memo(function WorkflowCanvas({
         nodeTypes={nodeTypes}
         panOnDrag
         panOnScroll
-        selectionOnDrag
+        selectionOnDrag={false}
+        connectionLineStyle={{ display: 'none' }}
         onNodesChange={(changes) => onNodesChange?.(changes)}
         onConnect={(c) => onConnect?.(c)}
         onNodeClick={(_, n) => onNodeClick?.(n.id)}
