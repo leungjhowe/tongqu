@@ -4,7 +4,6 @@ import {
   Background,
   Controls,
   MiniMap,
-  useStore,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import type { WorkflowGraph, WorkflowNode } from '@tps/workflow-core';
@@ -114,7 +113,8 @@ export function WorkflowCanvas({
     () => ({
       data: NodeEditorWrapper,
       transform: NodeEditorWrapper,
-      output: NodeEditorWrapper    }),
+      output: NodeEditorWrapper,
+    }),
     []
   );
 
@@ -136,7 +136,7 @@ export function WorkflowCanvas({
         <Background gap={32} size={1} color="#1f2937" />
         <Controls />
         <MiniMap pannable zoomable />
-        {/* Chat 浮层 — tapNow 风格，固定左下角 */}
+        {/* Chat 浮层 — 跟随节点下方（tapNow 风格） */}
         {activeNodeId && (
           <ChatPopover
             nodeId={activeNodeId}
@@ -145,7 +145,6 @@ export function WorkflowCanvas({
             draft={drafts.get(activeNodeId) ?? ''}
             pending={pendingNodeIds.has(activeNodeId)}
             onContentChange={(v) => {
-              // 编辑节点 content 写回 params.content
               const n = graph.nodes.find((nn) => nn.id === activeNodeId);
               if (n) {
                 onUpdateNode?.(n.id, {
