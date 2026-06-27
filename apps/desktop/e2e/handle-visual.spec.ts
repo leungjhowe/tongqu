@@ -23,10 +23,22 @@ async function setup(page: Page) {
 
 test.describe("Handle 视觉 + 磁吸", () => {
   test("鼠标靠近 handle 时对齐 + 边框颜色", async ({ page }) => {
+    page.on("console", (msg) => {
+      const t = msg.text();
+      if (t.startsWith("[NodeEditor]") || t.startsWith("[magnet]")) {
+        console.log("[browser]", t);
+      }
+    });
     await setup(page);
 
     // 找到 handle span（含有 border-2 的 span）
     const sourceHandle = page.locator('[style*="border: 2px solid"]').first();
+    await expect(sourceHandle).toBeAttached();
+
+    // 先双击节点让 active（磁吸依赖 active）
+    const node = page.locator(".react-flow__node").first();
+    await node.dblclick();
+    await page.waitForTimeout(500);
     await expect(sourceHandle).toBeVisible();
 
     // 截图 before

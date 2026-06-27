@@ -7,15 +7,18 @@ interface NodeEditorProps extends NodeEditorData {
   nodeType?: string;
 }
 
-const ATTRACT_RANGE = 42; // px — 进入此范围开始跟随
-const RELEASE_RANGE = 50; // px — 超出此范围归位
-const FULL_SNAP = 8; // px — 此距离内完全对齐鼠标
+const ATTRACT_RANGE = 42;
+const RELEASE_RANGE = 50;
+const FULL_SNAP = 8;
 
 /**
  * 文本节点 — tapNow 风格。
  *
- * 左右 Handle 圆圈在鼠标靠近时产生磁吸跟随效果，
- * 在节点边缘可以拉出连线范围时释放回原位。
+ * 磁吸行为：
+ *  - 只有节点 active 时才生效（与 ChatPopover 同源）
+ *  - mouse 靠近 → handle 中心平滑向鼠标偏移
+ *  - mouse 在正中心 8px 内 → handle 完全对齐
+ *  - mouse 远离 → 200ms 平滑归位
  */
 function NodeEditorImpl(props: NodeEditorProps) {
   const { title, params } = props;
@@ -23,27 +26,37 @@ function NodeEditorImpl(props: NodeEditorProps) {
   const sourceRef = useRef<HTMLSpanElement>(null);
   const targetRef = useRef<HTMLSpanElement>(null);
 
-  // 磁吸跟随：在窗口级别监听 pointermove
-  // 用 useState 存 handle 原始中心坐标（mount 时取一次后不再更新，
-  // 避免 transform 偏移 → 坐标变化 → 再偏移 的反馈闭环）
+  // useRef 存 origin，避免 setState 触发 re-render → effect 重跑 → 死循环
   const originSrc = useRef<{ x: number; y: number } | null>(null);
   const originTgt = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
-    const elS = sourceRef.current;
-    const elT = targetRef.current;
-    if (!elS || !elT) {
-      console.warn('[magnet] refs not ready');
+    if (!props.active) {
+      if (sourceRef.current) sourceRef.current.style.transform = '';
+      if (targetRef.current) targetRef.current.style.transform = '';
+      originSrc.current = null;
+      originTgt.current = null;
       return;
     }
 
-    // lazy init on first pointermove
+    const elS = sourceRef.current;
+    const elT = targetRef.current;
+    if (!elS || !elT) return;
+
+    // active 变化时立即 capture 一次
+    const rectS0 = elS.getBoundingClientRect();
+    const rectT0 = elT.getBoundingClientRect();
+    originSrc.current = { x: rectS0.left + rectS0.width / 2, y: rectS0.top + rectS0.height / 2 };
+    originTgt.current = { x: rectT0.left + rectT0.width / 2, y: rectT0.top + rectT0.height / 2 };
+    console.log('[magnet] active=true, origin=', originSrc.current, originTgt.current);
+
     const onMove = (e: PointerEvent) => {
+      // lazy init if refs still null
       if (!originSrc.current || !originTgt.current) {
-        const rectS = elS.getBoundingClientRect();
-        const rectT = elT.getBoundingClientRect();
-        originSrc.current = { x: rectS.left + rectS.width / 2, y: rectS.top + rectS.height / 2 };
-        originTgt.current = { x: rectT.left + rectT.width / 2, y: rectT.top + rectT.height / 2 };
+        const rS = elS.getBoundingClientRect();
+        const rT = elT.getBoundingClientRect();
+        originSrc.current = { x: rS.left + rS.width / 2, y: rS.top + rS.height / 2 };
+        originTgt.current = { x: rT.left + rT.width / 2, y: rT.top + rT.height / 2 };
       }
 
       const updateTransform = (el: HTMLElement, origin: { x: number; y: number }) => {
@@ -69,13 +82,14 @@ function NodeEditorImpl(props: NodeEditorProps) {
         }
       };
 
-      if (originSrc.current) updateTransform(elS, originSrc.current);
-      if (originTgt.current) updateTransform(elT, originTgt.current);
+      updateTransform(elS, originSrc.current);
+      updateTransform(elT, originTgt.current);
+      console.log('[magnet] move', { dist: Math.hypot(e.clientX - originSrc.current!.x, e.clientY - originSrc.current!.y) });
     };
 
     window.addEventListener('pointermove', onMove);
     return () => window.removeEventListener('pointermove', onMove);
-  }, []);
+  }, [props.active]);
 
   return (
     <div
@@ -85,7 +99,7 @@ function NodeEditorImpl(props: NodeEditorProps) {
           : 'border-border/60 hover:border-border-strong'
       }`}
     >
-      {/* 端口 — 左右两侧 + 圆圈 */}
+      {/* 端口 — 左右两侧 + 圆圈（仅 active 时磁吸） */}
       <Handle
         type="target"
         position={Position.Left}
@@ -93,7 +107,9 @@ function NodeEditorImpl(props: NodeEditorProps) {
       >
         <span
           ref={targetRef}
-          className="flex items-center justify-center w-7 h-7 rounded-full bg-transparent text-foreground/60 hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none"
+          className={`flex items-center justify-center w-7 h-7 rounded-full bg-transparent text-foreground/60 hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none ${
+            props.active ? 'opacity-100' : 'opacity-0'
+          }`}
           style={{ border: '2px solid rgba(180,185,192,0.85)' }}
         >
           <Plus className="w-4 h-4" />
@@ -106,7 +122,9 @@ function NodeEditorImpl(props: NodeEditorProps) {
       >
         <span
           ref={sourceRef}
-          className="flex items-center justify-center w-7 h-7 rounded-full bg-transparent text-foreground/60 hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none"
+          className={`flex items-center justify-center w-7 h-7 rounded-full bg-transparent text-foreground/60 hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none ${
+            props.active ? 'opacity-100' : 'opacity-0'
+          }`}
           style={{ border: '2px solid rgba(180,185,192,0.85)' }}
         >
           <Plus className="w-4 h-4" />
@@ -126,5 +144,6 @@ function NodeEditorImpl(props: NodeEditorProps) {
     </div>
   );
 }
+
 
 export default memo(NodeEditorImpl);
