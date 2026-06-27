@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { useStore, useReactFlow } from 'reactflow';
+import { useEffect, useRef } from 'react';
+import { useStore } from 'reactflow';
 import { Send, Plus } from 'lucide-react';
 import type { NodeChatMessage } from './WorkflowCanvas';
 
@@ -15,7 +15,7 @@ interface ChatPopoverProps {
 }
 
 /** React Flow store selector — 节点屏幕坐标 */
-const selectorNodePos = (nodeId: string) => (s: any) => {
+const selectorNodePos = (s: any, nodeId: string) => {
   const node = s.nodeLookup?.get(nodeId);
   const pos = node?.internals?.positionAbsolute;
   const measured = node?.measured;
@@ -50,7 +50,9 @@ export default function ChatPopover({
   onDraftChange,
   onSend,
 }: ChatPopoverProps) {
-  const pos = useStore(selectorNodePos(nodeId));
+  // 用单一 selector 函数（不带 nodeId 参数），用闭包注入 nodeId
+  // React Flow 11 useStore 要求 selector 引用稳定
+  const pos = useStore((s) => selectorNodePos(s, nodeId));
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
