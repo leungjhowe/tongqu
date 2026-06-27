@@ -54,16 +54,19 @@ export default function NodeAttachments({
 
     const update = () => {
       const s: any = storeApi.getState();
-      const nodeEntry = s.nodeInternals?.get(activeNodeId);
+      // 用 getNodes() 而不是 nodeInternals —
+      // getNodes() 在拖动时返回实时位置（含 drag offset）
+      const allNodes: any[] = s.getNodes?.() ?? [];
+      const node = allNodes.find((n: any) => n.id === activeNodeId);
 
-      if (!nodeEntry) {
-        el.style.display = 'none';
+      if (!node) {
+        // 拖动时节点可能在 store 中短暂缺失，不 hide，保持上次位置
         return;
       }
 
       el.style.display = '';
-      const pos = nodeEntry.positionAbsolute || nodeEntry.position || { x: 0, y: 0 };
-      const measured = nodeEntry.measured || {};
+      const pos = node.position ?? { x: 0, y: 0 };
+      const measured = node.measured ?? {};
       const w = measured.width ?? 240;
       const h = measured.height ?? 160;
       const [tx, ty, zoom] = s.transform as [number, number, number];
@@ -72,8 +75,13 @@ export default function NodeAttachments({
       el.style.top = `${(pos.y + h) * zoom + ty + 12}px`;
     };
 
+    // 立即跑一次初始化位置
     update();
+
     const unsub = storeApi.subscribe(() => {
+      // subscribe 在 store 变化后同步执行；
+      // 用 rAF 批量到下一帧避免连续更新
+      cancelAnimationFrame(raf);
       raf = requestAnimationFrame(update);
     });
 
