@@ -84,7 +84,7 @@ export default function ChatPopover({
         CP @{Math.round(screenX)},{Math.round(screenY)} z={vp.zoom.toFixed(2)} tick={tick}
       </div>
       <div
-        className="absolute pointer-events-none"
+        className="absolute pointer-events-none chat-popover-anim"
         style={{
           left: `${screenX}px`,
           top: `${screenY}px`,

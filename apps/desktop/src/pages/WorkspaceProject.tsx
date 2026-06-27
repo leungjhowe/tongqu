@@ -89,8 +89,11 @@ export default function WorkspaceProject() {
       ...prev,
       nodes: [...prev.nodes, newNode],
     }));
-    // 新增后自动激活，方便直接编辑
-    setActiveNodeId(nodeId);
+    // 等下一帧让 React Flow 完成新节点的 measure，
+    // 否则 ChatPopover 第一帧拿不到 measured 尺寸
+    requestAnimationFrame(() => {
+      setActiveNodeId(nodeId);
+    });
   }, []);
 
   /** 单击节点：选中（同时激活编辑器） */
