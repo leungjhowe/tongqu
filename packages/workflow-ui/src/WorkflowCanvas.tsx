@@ -38,6 +38,7 @@ export interface WorkflowCanvasProps {
   onNodeClick?: (nodeId: string) => void;
   onNodeDoubleClick?: (nodeId: string) => void;
   onPaneClick?: () => void;
+  onNodeDragStart?: (nodeId: string) => void;
   onNodeDragStop?: (nodeId: string, position: { x: number; y: number }) => void;
   onUpdateNode?: (nodeId: string, patch: Partial<WorkflowNode>) => void;
   messages: Map<string, NodeChatMessage[]>;
@@ -47,6 +48,7 @@ export interface WorkflowCanvasProps {
   onDraftChange?: (nodeId: string, text: string) => void;
   /** 自定义吸附内容（如 <ChatPanel />），渲染在激活节点下方 */
   attachment?: React.ReactNode;
+  attachmentDragging?: boolean;
   readOnly?: boolean;
 }
 
@@ -57,6 +59,7 @@ export function WorkflowCanvas({
   onNodeClick,
   onNodeDoubleClick,
   onPaneClick,
+  onNodeDragStart,
   onNodeDragStop,
   onUpdateNode,
   messages,
@@ -65,6 +68,7 @@ export function WorkflowCanvas({
   onSendChat,
   onDraftChange,
   attachment,
+  attachmentDragging,
   readOnly = false,
 }: WorkflowCanvasProps) {
   const nodes = useMemo(
@@ -138,6 +142,7 @@ export function WorkflowCanvas({
         onNodeClick={(_, n) => onNodeClick?.(n.id)}
         onNodeDoubleClick={(_, n) => onNodeDoubleClick?.(n.id)}
         onPaneClick={() => onPaneClick?.()}
+        onNodeDragStart={(_, n) => onNodeDragStart?.(n.id)}
         onNodeDragStop={(_, n) => onNodeDragStop?.(n.id, n.position)}
         fitView
       >
@@ -145,7 +150,7 @@ export function WorkflowCanvas({
         <Controls />
         <MiniMap pannable zoomable />
         {attachment && activeNodeId && (
-          <NodeAttachments activeNodeId={activeNodeId}>
+          <NodeAttachments activeNodeId={activeNodeId} dragging={attachmentDragging}>
             {attachment}
           </NodeAttachments>
         )}

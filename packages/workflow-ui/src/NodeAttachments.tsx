@@ -1,24 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useStoreApi, Panel } from 'reactflow';
 import { Send, Plus } from 'lucide-react';
 import type { NodeChatMessage } from './WorkflowCanvas';
-
-/**
- * 节点吸附系统：
- *  - NodeAttachments 容器：渲染所有激活节点的吸附（ChatPanel 等）
- *  - 跟随节点位置 — 使用 React Flow getViewport + getNode，订阅 store 实时刷新
- *  - 拖动时吸附跟随（不再因 store 暂时无节点而消失）
- *  - 切换节点：CSS transition fade in/out
- *
- * 用法：
- *   <NodeAttachments activeNodeId={id}>
- *     <ChatPanel ... />
- *   </NodeAttachments>
- *
- * 关键：使用 React Flow 的 <Panel position="bottom-center"> 作为宿主，
- * Panel 是 React Flow 自带 overlay，会被 React Flow 渲染到 viewport 内、
- * 应用相同的 viewport transform，并且正确处理事件路由 — 不影响节点拖拽。
- */
 
 export interface NodeAttachmentProps {
   nodeId: string;
@@ -26,82 +9,57 @@ export interface NodeAttachmentProps {
 
 export interface NodeAttachmentsProps {
   activeNodeId: string | null;
+  dragging?: boolean;
   children?: React.ReactNode;
   className?: string;
 }
 
 /**
- * 节点吸附系统 — 极致轻量实现。
- *
- * 只做一件事：跟随 active 节点坐标，渲染 children。
- * 用 useStoreApi 订阅 store，每次变化只更新 left/top 数值。
- * children 用 memo 优化，避免父组件重渲染时重建。
+ * 节点吸附系统 — 只计算一次位置，不跟踪拖动。
+ * 拖动时由父组件控制 dragging 位 → 隐藏。
  */
 export default function NodeAttachments({
   activeNodeId,
+  dragging,
   children,
   className = '',
 }: NodeAttachmentsProps) {
   const storeApi = useStoreApi();
-  const elRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
 
-  // 使用 rAF 驱动的位置更新，不触发 React re-render（直接操作 DOM）
   useEffect(() => {
-    const el = elRef.current;
-    if (!el || !activeNodeId) return;
+    if (!activeNodeId) {
+      setPos(null);
+      return;
+    }
+    const s: any = storeApi.getState();
+    const allNodes: any[] = s.getNodes?.() ?? [];
+    const node = allNodes.find((n: any) => n.id === activeNodeId);
+    if (!node) return;
 
-    let raf: number;
+    const p = node.position ?? { x: 0, y: 0 };
+    const measured = node.measured ?? {};
+    const w = measured.width ?? 240;
+    const h = measured.height ?? 160;
+    const [tx, ty, zoom] = s.transform as [number, number, number];
 
-    const update = () => {
-      const s: any = storeApi.getState();
-      // 用 getNodes() 而不是 nodeInternals —
-      // getNodes() 在拖动时返回实时位置（含 drag offset）
-      const allNodes: any[] = s.getNodes?.() ?? [];
-      const node = allNodes.find((n: any) => n.id === activeNodeId);
-
-      if (!node) {
-        // 拖动时节点可能在 store 中短暂缺失，不 hide，保持上次位置
-        return;
-      }
-
-      el.style.display = '';
-      const pos = node.position ?? { x: 0, y: 0 };
-      const measured = node.measured ?? {};
-      const w = measured.width ?? 240;
-      const h = measured.height ?? 160;
-      const [tx, ty, zoom] = s.transform as [number, number, number];
-
-      el.style.left = `${(pos.x + w / 2) * zoom + tx}px`;
-      el.style.top = `${(pos.y + h) * zoom + ty + 12}px`;
-    };
-
-    // 立即跑一次初始化位置
-    update();
-
-    const unsub = storeApi.subscribe(() => {
-      // subscribe 在 store 变化后同步执行；
-      // 用 rAF 批量到下一帧避免连续更新
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(update);
+    setPos({
+      x: (p.x + w / 2) * zoom + tx,
+      y: (p.y + h) * zoom + ty + 12,
     });
-
-    return () => {
-      cancelAnimationFrame(raf);
-      unsub();
-    };
   }, [activeNodeId, storeApi]);
 
-  if (!activeNodeId) return null;
+  if (!activeNodeId || !pos || dragging) return null;
 
   return (
     <Panel position="top-left" className="!m-0 !p-0 pointer-events-none">
-      {/* ref 指向的 div — 直接操作 style 避开 React reconcile */}
       <div
-        ref={elRef}
-        aria-hidden
-        className={`${className}`}
+        className={className}
         style={{
           position: 'absolute',
+          left: `${pos.x}px`,
+          top: `${pos.y}px`,
+          transform: 'translate(-50%, 0)',
           zIndex: 100,
           pointerEvents: 'none',
         }}
@@ -114,7 +72,7 @@ export default function NodeAttachments({
   );
 }
 
-/* ===== 内置 ChatPanel ===== */
+/* ===== ChatPanel ===== */
 
 interface ChatPanelProps {
   content: string;
@@ -161,29 +119,12 @@ export function ChatPanel({
         className="max-h-48 overflow-y-auto px-3 py-2 flex flex-col gap-2 scroll-smooth"
       >
         {messages.length === 0 && !pending && (
-          <p className="text-[11px] text-muted-foreground/60 text-center py-3">
-            描述内容后按 ↑ 发送，与 AI 对话
-          </p>
+          <p className="text-[11px] text-muted-foreground/60 text-center py-3">描述内容后按 Enter 发送，与 AI 对话</p>
         )}
         {messages.map((m) => (
-          <div
-            key={m.id}
-            className={`flex flex-col gap-0.5 text-[11px] ${
-              m.role === 'user' ? 'items-end' : 'items-start'
-            }`}
-          >
-            <span className="text-[9px] uppercase tracking-wider text-muted-foreground/50">
-              {m.role === 'user' ? '你' : 'AI'}
-            </span>
-            <div
-              className={`rounded px-2 py-1 max-w-[95%] whitespace-pre-wrap ${
-                m.role === 'user'
-                  ? 'bg-primary/15 text-foreground'
-                  : 'bg-secondary text-secondary-foreground'
-              }`}
-            >
-              {m.content}
-            </div>
+          <div key={m.id} className={`flex flex-col gap-0.5 text-[11px] ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
+            <span className="text-[9px] uppercase tracking-wider text-muted-foreground/50">{m.role === 'user' ? '你' : 'AI'}</span>
+            <div className={`rounded px-2 py-1 max-w-[95%] whitespace-pre-wrap ${m.role === 'user' ? 'bg-primary/15 text-foreground' : 'bg-secondary text-secondary-foreground'}`}>{m.content}</div>
           </div>
         ))}
         {pending && (
@@ -198,38 +139,19 @@ export function ChatPanel({
           type="text"
           value={draft}
           onChange={(e) => onDraftChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              onSend();
-            }
-          }}
+          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onSend(); } }}
           placeholder="向 AI 提问..."
-          aria-label="节点对话输入"
           className="flex-1 h-7 px-2 text-[11px] bg-background text-foreground rounded outline-none border border-border/70 focus:border-primary transition-colors"
         />
-        <button
-          type="button"
-          onClick={onSend}
-          disabled={!draft.trim() || pending}
-          aria-label="发送"
-          className="shrink-0 w-7 h-7 flex items-center justify-center bg-primary text-primary-foreground rounded hover:bg-primary-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
+        <button type="button" onClick={onSend} disabled={!draft.trim() || pending} className="shrink-0 w-7 h-7 flex items-center justify-center bg-primary text-primary-foreground rounded hover:bg-primary-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
           <Send className="w-3 h-3" />
         </button>
       </div>
       <div className="flex items-center justify-between px-3 py-1.5 border-t border-border/40 text-[10px] text-muted-foreground/70">
         <span>◆ Claude Sonnet</span>
-        <div className="flex items-center gap-2">
-          <span title="语音">🎤</span>
-          <span title="深度">1×</span>
-          <span>⌘1</span>
-        </div>
+        <div className="flex items-center gap-2"><span title="语音">🎤</span><span title="深度">1×</span><span>⌘1</span></div>
       </div>
-      <div
-        className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-card border-l border-t border-border"
-        aria-hidden
-      />
+      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-card border-l border-t border-border" aria-hidden />
     </div>
   );
 }

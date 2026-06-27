@@ -25,6 +25,8 @@ export default function WorkspaceProject() {
   const [graph, setGraph] = useState<WorkflowGraph>(EMPTY_GRAPH);
   // 双击激活的节点（编辑器展开）
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
+  // 节点拖动中 → 隐藏吸附浮层
+  const [nodeDragging, setNodeDragging] = useState(false);
   const [nodeMessages, setNodeMessages] = useState<Map<string, NodeChatMessage[]>>(
     () => new Map()
   );
@@ -247,10 +249,15 @@ export default function WorkspaceProject() {
             onNodeClick={handleNodeClick}
             onNodeDoubleClick={handleNodeDoubleClick}
             onPaneClick={handlePaneClick}
-            onNodeDragStop={handleNodeDragStop}
+            onNodeDragStart={() => setNodeDragging(true)}
+            onNodeDragStop={(id, pos) => {
+              setNodeDragging(false);
+              handleNodeDragStop(id, pos);
+            }}
             onUpdateNode={handleUpdateNode}
             onDraftChange={handleDraftChange}
             onSendChat={handleSendChat}
+            attachmentDragging={nodeDragging}
             attachment={
               activeNodeId ? (
                 <ChatPanel
