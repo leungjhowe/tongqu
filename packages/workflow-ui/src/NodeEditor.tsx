@@ -78,7 +78,8 @@ function NodeEditorImpl(props: NodeEditorProps) {
       >
         <span
           ref={targetRef}
-          className="flex items-center justify-center w-9 h-9 rounded-full bg-transparent border-2 border-foreground/90 text-foreground/80 hover:border-primary hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none"
+          className="flex items-center justify-center w-9 h-9 rounded-full bg-transparent text-foreground/80 hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none"
+          style={{ border: '2px solid rgba(255,255,255,0.85)' }}
         >
           <Plus className="w-4 h-4" />
         </span>
@@ -90,7 +91,8 @@ function NodeEditorImpl(props: NodeEditorProps) {
       >
         <span
           ref={sourceRef}
-          className="flex items-center justify-center w-9 h-9 rounded-full bg-transparent border-2 border-foreground/90 text-foreground/80 hover:border-primary hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none"
+          className="flex items-center justify-center w-9 h-9 rounded-full bg-transparent text-foreground/80 hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none"
+          style={{ border: '2px solid rgba(255,255,255,0.85)' }}
         >
           <Plus className="w-4 h-4" />
         </span>
