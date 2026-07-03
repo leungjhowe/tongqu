@@ -108,7 +108,7 @@ function NodeEditorImpl(props: NodeEditorProps) {
         <span
           ref={targetRef}
           className={`flex items-center justify-center w-7 h-7 rounded-full bg-transparent text-foreground/60 hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none ${
-            props.active ? 'opacity-100' : 'opacity-0'
+            (props.active || props.hover) ? "opacity-100" : "opacity-0"
           }`}
           style={{ border: '2px solid rgba(180,185,192,0.85)' }}
         >
@@ -123,7 +123,7 @@ function NodeEditorImpl(props: NodeEditorProps) {
         <span
           ref={sourceRef}
           className={`flex items-center justify-center w-7 h-7 rounded-full bg-transparent text-foreground/60 hover:text-primary hover:scale-110 transition-all duration-base pointer-events-none ${
-            props.active ? 'opacity-100' : 'opacity-0'
+            (props.active || props.hover) ? "opacity-100" : "opacity-0"
           }`}
           style={{ border: '2px solid rgba(180,185,192,0.85)' }}
         >

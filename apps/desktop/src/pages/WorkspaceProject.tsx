@@ -25,6 +25,7 @@ export default function WorkspaceProject() {
   const [graph, setGraph] = useState<WorkflowGraph>(EMPTY_GRAPH);
   // 双击激活的节点（编辑器展开）
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
+  const [hoverNodeId, setHoverNodeId] = useState<string | null>(null);
   // 拖动中标识 — 隐藏吸附浮层
   const [nodeDragging, setNodeDragging] = useState(false);
   const handleDragStart = useCallback(() => setNodeDragging(true), []);
@@ -124,6 +125,14 @@ export default function WorkspaceProject() {
     },
     [handleUpdateNode]
   );
+
+  // 暴露 handleAddNode 到 window（dev/E2E 用，避开 hover flyout 的脆弱性）
+  useEffect(() => {
+    (window as any).__workspaceAddNode = handleAddNode;
+    return () => {
+      delete (window as any).__workspaceAddNode;
+    };
+  }, [handleAddNode]);
 
   /** 更新某节点的草稿（输入框实时绑定） */
   const handleDraftChange = useCallback((nodeId: string, text: string) => {
@@ -246,11 +255,14 @@ export default function WorkspaceProject() {
           <WorkflowCanvas
             graph={graph}
             activeNodeId={activeNodeId}
+            hoverNodeId={hoverNodeId}
             messages={nodeMessages}
             drafts={nodeDrafts}
             pendingNodeIds={pendingNodeIds}
             onNodeClick={handleNodeClick}
             onNodeDoubleClick={handleNodeDoubleClick}
+            onNodeMouseEnter={(id) => setHoverNodeId(id)}
+            onNodeMouseLeave={() => setHoverNodeId(null)}
             onPaneClick={handlePaneClick}
             onNodeDragStart={handleDragStart}
             onNodesChange={(changes: NodeChange[]) => {

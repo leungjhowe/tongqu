@@ -24,6 +24,7 @@ export interface NodeEditorData extends Record<string, unknown> {
   title: string;
   params: Record<string, unknown>;
   active: boolean;
+  hover: boolean;
   messages: NodeChatMessage[];
   draft: string;
   pending: boolean;
@@ -36,9 +37,12 @@ export interface NodeEditorData extends Record<string, unknown> {
 export interface WorkflowCanvasProps {
   graph: WorkflowGraph;
   activeNodeId: string | null;
+  hoverNodeId?: string | null;
   /** 当前激活节点的预览文本（展示在 chat 顶部） */
   activeNodeContent?: string;
   onNodeClick?: (nodeId: string) => void;
+  onNodeMouseEnter?: (nodeId: string) => void;
+  onNodeMouseLeave?: (nodeId: string) => void;
   onNodeDoubleClick?: (nodeId: string) => void;
   onPaneClick?: () => void;
   onNodeDragStart?: (nodeId: string) => void;
@@ -62,8 +66,11 @@ export interface WorkflowCanvasProps {
 export const WorkflowCanvas = memo(function WorkflowCanvas({
   graph,
   activeNodeId,
+  hoverNodeId,
   activeNodeContent,
   onNodeClick,
+  onNodeMouseEnter,
+  onNodeMouseLeave,
   onNodeDoubleClick,
   onPaneClick,
   onNodeDragStart,
@@ -87,9 +94,11 @@ export const WorkflowCanvas = memo(function WorkflowCanvas({
         const draft = drafts.get(n.id) ?? '';
         const pending = pendingNodeIds.has(n.id);
         const isActive = activeNodeId === n.id;
+        const isHover = hoverNodeId === n.id;
         const data: NodeEditorData = {
           title: n.title,
           params: n.params,
+          hover: isHover,
           active: isActive,
           messages: nodeMessages,
           draft,
@@ -113,7 +122,7 @@ export const WorkflowCanvas = memo(function WorkflowCanvas({
           data,
         };
       }),
-    [graph.nodes, activeNodeId, messages, drafts, pendingNodeIds, onUpdateNode, onSendChat, onDraftChange]
+    [graph.nodes, activeNodeId, hoverNodeId, messages, drafts, pendingNodeIds, onUpdateNode, onSendChat, onDraftChange]
   );
 
   const edges = useMemo(
@@ -154,6 +163,8 @@ export const WorkflowCanvas = memo(function WorkflowCanvas({
         // onConnect 仅交给 ConnectionOverlay 处理，不传给 ReactFlow
         // 否则 React Flow 会画蓝色连接线干扰
         onNodeClick={(_, n) => onNodeClick?.(n.id)}
+        onNodeMouseEnter={(_, n) => onNodeMouseEnter?.(n.id)}
+        onNodeMouseLeave={(_, n) => onNodeMouseLeave?.(n.id)}
         onNodeDoubleClick={(_, n) => onNodeDoubleClick?.(n.id)}
         onPaneClick={() => onPaneClick?.()}
         onNodeDragStart={(_, n) => {

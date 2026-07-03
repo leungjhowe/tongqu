@@ -20,6 +20,13 @@ export default defineConfig({
         viewport: { width: 2560, height: 1440 },
       },
     },
+    {
+      name: "webkit-2k",
+      use: {
+        ...devices["Desktop Safari"],
+        viewport: { width: 2560, height: 1440 },
+      },
+    },
   ],
   webServer: {
     command: "pnpm dev",

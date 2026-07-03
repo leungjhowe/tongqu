@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 
 async function loginAsGuest(page: Page) {
-  await page.goto("/login");
+  await page.goto("http://localhost:1420/login");
   await page.getByRole("button", { name: /以游客身份进入/ }).click();
   const guestName = `e2e-connect-${Date.now()}`;
   await page.getByLabel("游客用户名").fill(guestName);
@@ -10,7 +10,7 @@ async function loginAsGuest(page: Page) {
 }
 
 async function createTwoNodesAndConnect(page: Page) {
-  await page.goto("/app/workspace");
+  await page.goto("http://localhost:1420/app/workspace");
   await page.getByRole("button", { name: /\+ 新建项目/ }).click();
   const nameInput = page.getByLabel("项目名称");
   const projectName = `connect-test-${Date.now()}`;
@@ -20,13 +20,13 @@ async function createTwoNodesAndConnect(page: Page) {
 
   await page.waitForSelector(".react-flow", { timeout: 10000 });
 
-  // 添 2 个文本节点（点击 ➕ 两次）
-  const addBtn = page.getByTitle("新增节点");
+  // 添 2 个文本节点（通过 window 暴露的 handleAddNode，避开 hover flyout）
+  await page.waitForFunction(
+    () => typeof (window as any).__workspaceAddNode === "function"
+  );
   for (let i = 0; i < 2; i++) {
-    await addBtn.hover();
-    await page.waitForTimeout(200);
-    await page.getByRole("button", { name: /文本节点/ }).click();
-    await page.waitForTimeout(200);
+    await page.evaluate(() => (window as any).__workspaceAddNode("data"));
+    await page.waitForTimeout(300);
   }
 
   const nodes = page.locator(".react-flow__node");
@@ -37,8 +37,9 @@ async function createTwoNodesAndConnect(page: Page) {
 test.describe("节点连接（ConnectionOverlay）", () => {
   test("从节点1右侧端口拖到节点2左侧端口 — 创建 edge", async ({ page }) => {
     page.on("console", (msg) => {
-      if (msg.text().includes("[connect-debug]") || msg.text().includes("[start]")) {
-        console.log("[browser]", msg.text());
+      const text = msg.text();
+      if (text.startsWith("[conn]") || text.startsWith("[toolbar")) {
+        console.log("[browser]", text);
       }
     });
 
@@ -64,6 +65,7 @@ test.describe("节点连接（ConnectionOverlay）", () => {
     const targetY = box1!.y + box1!.height / 2;
 
     console.log(`[test] source: (${sourceX}, ${sourceY}), target: (${targetX}, ${targetY})`);
+    await page.screenshot({ path: "e2e/screenshots/connect-0-before.png" });
 
     // 拖动
     await page.mouse.move(sourceX, sourceY);
@@ -77,8 +79,11 @@ test.describe("节点连接（ConnectionOverlay）", () => {
     // 移动到目标
     await page.mouse.move(targetX, targetY, { steps: 10 });
 
+    await page.screenshot({ path: "e2e/screenshots/connect-1-mid.png" });
+
     // 等吸附生效
     await page.waitForTimeout(200);
+    await page.screenshot({ path: "e2e/screenshots/connect-2-near-target.png" });
 
     // 截图查看 ghost / 吸附高亮 / 终点 snap
     await page.screenshot({

@@ -36,3 +36,10 @@ apps/desktop/src-tauri/icons/*.bak
 # Playwright test artifacts
 test-results/
 playwright-report/
+e2e/screenshots/
+
+# Claude Code
+.claude/plans/
+
+# Local history
+.history/
