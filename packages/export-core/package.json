@@ -1,5 +1,5 @@
 {
-  "name": "@tps/export-core",
+  "name": "@tongqu/export-core",
   "version": "0.1.0",
   "type": "module",
   "main": "./src/index.ts",
@@ -19,7 +19,7 @@
     "clean": "rm -rf dist .tsbuildinfo"
   },
   "dependencies": {
-    "@tps/shared": "workspace:*"
+    "@tongqu/shared": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.4"

@@ -1,5 +1,5 @@
 {
-  "name": "@tps/ai-core",
+  "name": "@tongqu/ai-core",
   "version": "0.1.0",
   "type": "module",
   "main": "./src/index.ts",
@@ -20,8 +20,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.106.0",
-    "@tps/shared": "workspace:*",
-    "@tps/workflow-core": "workspace:*"
+    "@tongqu/shared": "workspace:*",
+    "@tongqu/workflow-core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.4"

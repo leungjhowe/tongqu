@@ -1,5 +1,5 @@
 {
-  "name": "@tps/ui",
+  "name": "@tongqu/ui",
   "version": "0.1.0",
   "type": "module",
   "main": "./src/index.ts",
@@ -28,7 +28,7 @@
     "react-dom": "^18.3.1"
   },
   "dependencies": {
-    "@tps/shared": "workspace:*",
+    "@tongqu/shared": "workspace:*",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "react-textarea-autosize": "^8.5.9",

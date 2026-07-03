@@ -1,11 +1,11 @@
 {
-  "name": "@tps/workflow-core",
+  "name": "@tongqu/workflow-core",
   "version": "0.1.0",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": { ".": { "types": "./src/index.ts", "import": "./src/index.ts" } },
   "scripts": { "build": "tsc -b", "lint": "echo no", "clean": "rm -rf dist .tsbuildinfo" },
-  "dependencies": { "@tps/shared": "workspace:*" },
+  "dependencies": { "@tongqu/shared": "workspace:*" },
   "devDependencies": { "typescript": "^5.5.4" }
 }

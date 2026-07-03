@@ -1,5 +1,5 @@
 {
-  "name": "@tps/data-core",
+  "name": "@tongqu/data-core",
   "version": "0.1.0",
   "type": "module",
   "main": "./src/index.ts",
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@libsql/client": "^0.17.4",
-    "@tps/shared": "workspace:*",
+    "@tongqu/shared": "workspace:*",
     "bcryptjs": "^3.0.3",
     "drizzle-orm": "^0.45.2",
     "nanoid": "^5.1.16"
