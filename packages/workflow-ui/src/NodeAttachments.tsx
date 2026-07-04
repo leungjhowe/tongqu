@@ -114,7 +114,7 @@ export function ChatPanel({
   useEffect(() => {
     listRef.current?.scrollTo({
       top: listRef.current.scrollHeight,
-      behavior: 'smooth',
+      behavior: 'auto',
     });
   }, [messages.length, pending]);
 
@@ -220,7 +220,7 @@ export function AIChatPanel({
   useEffect(() => {
     listRef.current?.scrollTo({
       top: listRef.current.scrollHeight,
-      behavior: 'smooth',
+      behavior: 'auto',
     });
   }, [messages.length, pending]);
 

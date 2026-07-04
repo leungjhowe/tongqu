@@ -68,7 +68,7 @@ export async function createProject(input: {
       values.openedAt?.getTime() ?? null,
     ],
   );
-  const created = await getProjectById(values.id);
+  const created = await getProjectById(values.id!);
   if (!created) throw new Error('Failed to create project');
   return created;
 }
