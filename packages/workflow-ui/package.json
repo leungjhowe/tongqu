@@ -4,13 +4,31 @@
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
-  "exports": { ".": { "types": "./src/index.ts", "import": "./src/index.ts" } },
-  "scripts": { "build": "tsc -b", "lint": "echo no", "clean": "rm -rf dist .tsbuildinfo" },
-  "peerDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "echo no",
+    "clean": "rm -rf dist .tsbuildinfo"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
   "dependencies": {
     "@tongqu/shared": "workspace:*",
     "@tongqu/workflow-core": "workspace:*",
-    "reactflow": "^11.11.4"
+    "lucide-react": "^1.21.0",
+    "react-dropzone": "^15.0.0",
+    "react-mentions": "^4.4.10",
+    "react-speech-recognition": "^4.0.1",
+    "reactflow": "^11.11.4",
+    "remark-gfm": "^4.0.1",
+    "streamdown": "^2.5.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.11",

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { NAV_ITEMS, type NavKey } from "@tps/shared";
+import { NAV_ITEMS, type NavKey } from "@tongqu/shared";
 import { HomeIcon, LayoutIcon, ArchiveIcon, LayersIcon } from "lucide-react";
 import { useUIStore } from "@/stores/uiStore";
 import NavCapsule from "./NavCapsule";

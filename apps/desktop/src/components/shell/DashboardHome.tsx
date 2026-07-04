@@ -5,7 +5,7 @@ import {
   createProject,
   touchProject,
   type Project,
-} from "@tps/data-core";
+} from "@tongqu/data-core";
 import { useUIStore } from "@/stores/uiStore";
 import { useAuthStore } from "@/stores/authStore";
 import HeroHeadline from "./HeroHeadline";

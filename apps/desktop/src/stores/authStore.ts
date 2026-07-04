@@ -5,7 +5,7 @@ import {
   comparePassword,
   createGuestUser,
   type User as DbUser,
-} from "@tps/data-core";
+} from "@tongqu/data-core";
 
 /** UI 层用的精简 User（去掉 passwordHash 等）。 */
 export interface User {
@@ -132,7 +132,7 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: "tps-auth",
+      name: "tongqu-auth",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,

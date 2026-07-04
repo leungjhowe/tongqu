@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStoreApi } from 'reactflow';
 import { Plus } from 'lucide-react';
-import type { WorkflowNode } from '@tps/workflow-core';
+import type { WorkflowNode } from '@tongqu/workflow-core';
 
 const DBG = (tag: string, data: any) =>
   console.log(`[conn][${tag}]`, JSON.stringify(data));

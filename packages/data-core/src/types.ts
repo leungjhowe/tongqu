@@ -1,4 +1,4 @@
-import type { ID } from '@tps/shared/types';
+import type { ID } from '@tongqu/shared/types';
 
 export type ColumnType = 'string' | 'number' | 'boolean' | 'date' | 'geometry';
 

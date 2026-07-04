@@ -23,7 +23,7 @@ tps/
 ├── tauri/
 │   └── rust-core/            # Rust 能力层（占位，未来承载 GIS / DuckDB native 等）
 ├── pnpm-workspace.yaml
-├── tsconfig.base.json        # strict TS + path aliases（@tps/*）
+├── tsconfig.base.json        # strict TS + path aliases（@tongqu/*）
 ├── package.json              # 根脚本（dev / build / tauri:* / lint / clean）
 └── README.md
 ```
@@ -87,6 +87,6 @@ pnpm clean
 本仓库当前处于“骨架阶段”：monorepo 结构、依赖分层、tsconfig 别名、占位包已就绪。后续将按 wave 逐步落地：
 
 - wave 2：实现各 `packages/*` 的真实能力（保持无 React/无 UI 边界）
-- wave 3：把 `apps/desktop` 中已有的 UI 拆入 `@tps/ui`，并接入 workspace 依赖
+- wave 3：把 `apps/desktop` 中已有的 UI 拆入 `@tongqu/ui`，并接入 workspace 依赖
 
 参考规范：`.claude/my/monorepo.md`。

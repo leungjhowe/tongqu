@@ -10,7 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-// Input from "@tps/ui" was replaced with inline FloatingInput below.
+// Input from "@tongqu/ui" was replaced with inline FloatingInput below.
 import { useAuthStore } from "@/stores/authStore";
 import { ArrowRight, CircleDot, Loader2 } from "lucide-react";
 

@@ -4,12 +4,13 @@ import { ReactFlowProvider, type NodeChange } from "reactflow";
 import {
   WorkflowCanvas,
   NodeAttachments,
-  ChatPanel,
+  AIChatPanel,
   type NodeChatMessage,
-} from "@tps/workflow-ui";
-import { getProjectById, touchProject, type Project } from "@tps/data-core";
-import type { WorkflowGraph, WorkflowNode } from "@tps/workflow-core";
-import { ClaudeProvider, getStoredApiKey, type LLMMessage } from "@tps/ai-core";
+  type AIInputPayload,
+} from "@tongqu/workflow-ui";
+import { getProjectById, touchProject, type Project } from "@tongqu/data-core";
+import type { WorkflowGraph, WorkflowNode } from "@tongqu/workflow-core";
+import { ClaudeProvider, getStoredApiKey, type LLMMessage } from "@tongqu/ai-core";
 import WorkflowToolbar from "@/components/workflow/WorkflowToolbar";
 
 /** 空工作流图（初始状态）。 */
@@ -145,7 +146,7 @@ export default function WorkspaceProject() {
 
   /** 发送节点对话 */
   const handleSendChat = useCallback(
-    async (nodeId: string, text: string) => {
+    async (nodeId: string, text: string, payload?: AIInputPayload) => {
       // 1) 用户消息入栈
       msgCounter.current += 1;
       const userMsg: NodeChatMessage = {
@@ -174,7 +175,19 @@ export default function WorkspaceProject() {
       // 4) 取节点上下文
       const node = graphRef.current.nodes.find((n) => n.id === nodeId);
 
-      // 5) 调 LLM
+      // 5) 组装 system 上下文 — 把 mentions/attachments 注入提示
+      const mentionLine =
+        payload && payload.mentions.length
+          ? `\n@提及：${payload.mentions.map((m) => `${m.display}(${m.id})`).join("、")}`
+          : "";
+      const attachLine =
+        payload && payload.attachments.length
+          ? `\n附件：${payload.attachments
+              .map((a) => `${a.file.name}(${a.type})`)
+              .join("、")}`
+          : "";
+
+      // 6) 调 LLM
       let aiContent: string;
       const apiKey = getStoredApiKey();
 
@@ -187,7 +200,7 @@ export default function WorkspaceProject() {
           const messages: LLMMessage[] = [
             {
               role: "system",
-              content: `你是 TPS 交通规划 AI 工作流系统的助手。\n节点：${node?.title ?? nodeId} (${node?.type ?? "未知"})\n参数：${JSON.stringify(node?.params ?? {})}\n用中文简洁回答，200 字以内。`,
+              content: `你是 TPS 交通规划 AI 工作流系统的助手。\n节点：${node?.title ?? nodeId} (${node?.type ?? "未知"})\n参数：${JSON.stringify(node?.params ?? {})}${mentionLine}${attachLine}\n用中文简洁回答，200 字以内。`,
             },
             { role: "user", content: text },
           ];
@@ -298,13 +311,12 @@ export default function WorkspaceProject() {
             onSendChat={handleSendChat}
             attachment={
               activeNodeId ? (
-                <ChatPanel
+                <AIChatPanel
                   content={
                     (graph.nodes.find((n) => n.id === activeNodeId)
                       ?.params.content as string | undefined) ?? ''
                   }
                   messages={nodeMessages.get(activeNodeId) ?? []}
-                  draft={nodeDrafts.get(activeNodeId) ?? ''}
                   pending={pendingNodeIds.has(activeNodeId)}
                   onContentChange={(v) =>
                     handleUpdateNode(activeNodeId, {
@@ -315,12 +327,11 @@ export default function WorkspaceProject() {
                       },
                     })
                   }
-                  onDraftChange={(t) => handleDraftChange(activeNodeId, t)}
-                  onSend={() => {
-                    const text = (
-                      nodeDrafts.get(activeNodeId) ?? ''
-                    ).trim();
-                    if (text) handleSendChat(activeNodeId, text);
+                  onSend={(text) => {
+                    if (text.trim()) handleSendChat(activeNodeId, text);
+                  }}
+                  onPayloadSend={(payload) => {
+                    handleSendChat(activeNodeId, payload.text, payload);
                   }}
                 />
               ) : undefined

@@ -1,4 +1,4 @@
-import type { ID } from '@tps/shared';
+import type { ID } from '@tongqu/shared';
 
 export type AssetKind = 'layer-style' | 'chart-template' | 'workflow-template' | 'config';
 

@@ -1,9 +1,15 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Default capabilities for the TPS desktop application",
+  "description": "Default capabilities for the Tongqu desktop application",
   "windows": ["main"],
   "permissions": [
-    "core:default"
+    "core:default",
+    "sql:allow-load",
+    "sql:allow-execute",
+    "sql:allow-select",
+    "sql:allow-close",
+    "fs:allow-write-text-file",
+    "fs:allow-read-text-file"
   ]
 }

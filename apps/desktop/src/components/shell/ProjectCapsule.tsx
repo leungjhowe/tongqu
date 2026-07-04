@@ -1,5 +1,5 @@
 import { FolderOpen } from "lucide-react";
-import type { Project } from "@tps/data-core";
+import type { Project } from "@tongqu/data-core";
 
 interface ProjectCapsuleProps {
   project: Project;

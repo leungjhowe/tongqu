@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
-import { eq } from 'drizzle-orm';
+import { nanoid } from 'nanoid';
 import { db } from './db';
-import { users, type User } from './schema';
+import type { User, NewUser } from './schema';
 
 const GUEST_PASSWORD_PLACEHOLDER = '!';
 const BCRYPT_COST = 10;
@@ -16,29 +16,27 @@ export async function comparePassword(plain: string, hash: string): Promise<bool
 
 /** 按 username 查用户（不限 is_guest）。 */
 export async function findUserByUsername(username: string): Promise<User | null> {
-  const rows = await db
-    .select()
-    .from(users)
-    .where(eq(users.username, username))
-    .limit(1);
+  const rows = await db.select<User>(
+    `SELECT id, username, password_hash, is_guest, created_at
+     FROM users WHERE username = ? LIMIT 1`,
+    [username],
+  );
   return rows[0] ?? null;
 }
 
 /**
  * 创建游客用户。
  * 假设 caller 已确认 username 未被已注册账号占用（is_guest=false）。
- * 如果 username 已被游客占用，本函数也会冲突 — 让 drizzle 抛 unique constraint 错误。
+ * 如果 username 已被游客占用，本函数也会冲突 — 让 SQL 抛 unique constraint 错误。
  */
 export async function createGuestUser(username: string): Promise<User> {
-  const rows = await db
-    .insert(users)
-    .values({
-      username,
-      passwordHash: GUEST_PASSWORD_PLACEHOLDER,
-      isGuest: true,
-    })
-    .returning();
-  const created = rows[0];
+  const id = nanoid();
+  await db.execute(
+    `INSERT INTO users (id, username, password_hash, is_guest, created_at)
+     VALUES (?, ?, ?, ?, ?)`,
+    [id, username, GUEST_PASSWORD_PLACEHOLDER, 1, Date.now()],
+  );
+  const created = await findUserByUsername(username);
   if (!created) throw new Error('Failed to create guest user');
   return created;
 }

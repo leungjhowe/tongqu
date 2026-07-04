@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { NavKey } from "@tps/shared";
+import type { NavKey } from "@tongqu/shared";
 
 export type BackdropVariant = "flow" | "grid" | "plain";
 

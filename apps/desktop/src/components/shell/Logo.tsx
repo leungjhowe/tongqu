@@ -1,5 +1,5 @@
-import { Capsule } from "@tps/ui";
-import { APP_NAME } from "@tps/shared";
+import { Capsule } from "@tongqu/ui";
+import { APP_NAME } from "@tongqu/shared";
 
 interface LogoProps {
   onClick?: () => void;

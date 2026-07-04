@@ -1,4 +1,4 @@
-import type { ID } from '@tps/shared/types';
+import type { ID } from '@tongqu/shared/types';
 
 export type LayerKind = 'heatmap' | 'flow' | 'choropleth' | 'base';
 

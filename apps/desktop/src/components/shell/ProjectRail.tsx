@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import type { Project } from "@tps/data-core";
+import type { Project } from "@tongqu/data-core";
 import NewProjectCapsule from "./NewProjectCapsule";
 import ProjectCapsule from "./ProjectCapsule";
 

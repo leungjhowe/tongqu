@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
-import { Button } from "@tps/ui";
-import type { WorkflowNode } from "@tps/workflow-core";
+import { Button } from "@tongqu/ui";
+import type { WorkflowNode } from "@tongqu/workflow-core";
 import {
   X,
   ChevronRight,

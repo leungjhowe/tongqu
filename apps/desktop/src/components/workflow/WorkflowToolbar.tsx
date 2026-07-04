@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Plus, Search, Archive, Layout, History, Type } from "lucide-react";
-import type { WorkflowNode } from "@tps/workflow-core";
+import type { WorkflowNode } from "@tongqu/workflow-core";
 
 /** 可添加的节点类型定义 */
 interface NodeTypeDef {

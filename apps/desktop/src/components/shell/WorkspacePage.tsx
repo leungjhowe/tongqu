@@ -6,7 +6,7 @@ import {
   renameProject,
   archiveProject,
   type Project,
-} from "@tps/data-core";
+} from "@tongqu/data-core";
 import { useAuthStore } from "@/stores/authStore";
 import { Archive, Pencil, FolderOpen } from "lucide-react";
 import NewProjectModal from "./NewProjectModal";

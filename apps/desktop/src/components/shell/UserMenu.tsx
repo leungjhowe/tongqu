@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Capsule } from "@tps/ui";
+import { Capsule } from "@tongqu/ui";
 import { User as UserIcon, Settings, LogOut } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 

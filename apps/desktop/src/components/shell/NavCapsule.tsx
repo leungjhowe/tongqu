@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { Capsule } from "@tps/ui";
-import type { NavKey } from "@tps/shared";
+import { Capsule } from "@tongqu/ui";
+import type { NavKey } from "@tongqu/shared";
 
 interface NavCapsuleProps {
   navKey: NavKey;

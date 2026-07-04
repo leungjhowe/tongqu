@@ -1,4 +1,4 @@
-import type { WorkflowGraph } from '@tps/workflow-core';
+import type { WorkflowGraph } from '@tongqu/workflow-core';
 import type { LLMProvider } from './providers';
 
 export interface CompileRequest {

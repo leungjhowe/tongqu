@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { createProject, type Project } from "@tps/data-core";
+import { createProject, type Project } from "@tongqu/data-core";
 import { useAuthStore } from "@/stores/authStore";
 
 interface NewProjectModalProps {

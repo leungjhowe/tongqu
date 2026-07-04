@@ -8,10 +8,9 @@ import {
   type NodeChange,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import type { WorkflowGraph, WorkflowNode } from '@tps/workflow-core';
+import type { WorkflowGraph, WorkflowNode } from '@tongqu/workflow-core';
 import NodeEditor from './NodeEditor';
 import NodeAttachments from './NodeAttachments';
-import ChatPanel from './NodeAttachments';
 import ConnectionOverlay from './ConnectionOverlay';
 
 export interface NodeChatMessage {

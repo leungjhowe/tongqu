@@ -1,5 +1,5 @@
 import { type KeyboardEvent } from "react";
-import { AutoTextarea } from "@tps/ui";
+import { AutoTextarea } from "@tongqu/ui";
 import { Paperclip, Image as ImageIcon, AtSign, Mic, ArrowUp } from "lucide-react";
 import { useUIStore } from "@/stores/uiStore";
 

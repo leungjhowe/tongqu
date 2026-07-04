@@ -1,5 +1,5 @@
 import "virtual:uno.css";
-import "@tps/ui/styles";
+import "@tongqu/ui/styles";
 
 import React from "react";
 import ReactDOM from "react-dom/client";
