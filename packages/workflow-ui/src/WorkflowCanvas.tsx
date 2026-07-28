@@ -176,7 +176,7 @@ export const WorkflowCanvas = memo(function WorkflowCanvas({
         onNodeDragStop={(_, n) => {
           onNodeDragStop?.(n.id, n.position);
         }}
-        fitView
+        fitView={{ minZoom: 0.6, maxZoom: 1 }}
       >
         <Background gap={32} size={1} color="#1f2937" />
         <Controls />

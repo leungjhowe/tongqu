@@ -30,6 +30,9 @@ importers:
       concurrently:
         specifier: ^10.0.3
         version: 10.0.3
+      playwright:
+        specifier: ^1.61.1
+        version: 1.61.1
       sass:
         specifier: ^1.79.4
         version: 1.101.0

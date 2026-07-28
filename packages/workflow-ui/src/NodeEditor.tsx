@@ -93,11 +93,12 @@ function NodeEditorImpl(props: NodeEditorProps) {
 
   return (
     <div
-      className={`relative aspect-square w-[180px] bg-card text-card-foreground rounded-xl border transition-all duration-base ${
+      className={`relative aspect-square bg-card text-card-foreground rounded-xl border transition-all duration-base ${
         props.active
           ? 'border-primary shadow-glow-primary'
           : 'border-border/60 hover:border-border-strong'
       }`}
+      style={{ width: '180px' }}
     >
       {/* 端口 — 左右两侧 + 圆圈（仅 active 时磁吸） */}
       <Handle
