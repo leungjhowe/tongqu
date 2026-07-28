@@ -43,3 +43,6 @@ e2e/screenshots/
 
 # Local history
 .history/
+
+e2e/node-size.spec.ts
+e2e-node-size-result.png
